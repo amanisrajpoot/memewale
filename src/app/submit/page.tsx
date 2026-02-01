@@ -4,10 +4,12 @@ import { UploadForm } from "@/components/upload/UploadForm";
 import { Button } from "@/components/ui/Button";
 import { useState } from "react";
 import { Wand2 } from "lucide-react";
+import { useToast } from "@/hooks/useToast";
 
 export default function SubmitPage() {
     const [caption, setCaption] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const { addToast } = useToast();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -15,11 +17,11 @@ export default function SubmitPage() {
         // Simulate API call
         await new Promise((resolve) => setTimeout(resolve, 1500));
         setIsSubmitting(false);
-        alert("Meme submitted successfully! 🚀");
+        addToast("Meme submitted successfully! 🚀", "success");
     };
 
     return (
-        <div className="container max-w-2xl mx-auto px-4 py-8">
+        <div className="feed-container" style={{ paddingLeft: '1rem', paddingRight: '1rem', paddingTop: '2rem', paddingBottom: '2rem' }}>
             <div className="mb-8 text-center">
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] bg-clip-text text-transparent">
                     Submit a Meme

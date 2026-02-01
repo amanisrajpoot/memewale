@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { AppShell } from "@/components/shell";
+import { ToastContainer } from "@/components/ui/ToastContainer";
 import "./globals.css";
 
 const inter = Inter({
@@ -61,6 +62,7 @@ export default function RootLayout({
     <html lang="en" className={inter.variable}>
       <body className="antialiased">
         <AppShell>{children}</AppShell>
+        <ToastContainer />
       </body>
     </html>
   );

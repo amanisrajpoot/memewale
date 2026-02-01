@@ -45,9 +45,7 @@ export function TopNav({ onMenuClick, onSearchClick }: TopNavProps) {
                 className={cn(
                     "h-full",
                     "flex items-center justify-between gap-4",
-                    "px-4",
-                    // On desktop with sidebar, offset the content
-                    "lg:pl-[calc(var(--sidebar-width)+1rem)]"
+                    "px-4"
                 )}
             >
                 {/* Left section: Menu (mobile) + Logo */}
@@ -82,7 +80,11 @@ export function TopNav({ onMenuClick, onSearchClick }: TopNavProps) {
                 {/* Center: Search bar (desktop) */}
                 <div className="hidden md:flex flex-1 justify-center mx-4">
                     <SearchBar
-                        onSearch={(q) => console.log("Searching:", q)}
+                        onSearch={(q) => {
+                            if (typeof window !== 'undefined') {
+                                window.location.href = `/search?q=${encodeURIComponent(q)}`;
+                            }
+                        }}
                         className="max-w-md w-full"
                     />
                 </div>
@@ -150,7 +152,7 @@ export function TopNav({ onMenuClick, onSearchClick }: TopNavProps) {
                 isOpen={isLoginModalOpen}
                 onClose={() => setIsLoginModalOpen(false)}
             />
-        </header>
+        </header >
     );
 }
 

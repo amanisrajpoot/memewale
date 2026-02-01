@@ -23,15 +23,23 @@ export function CommentThread({
     const hasReplies = comment.replies && comment.replies.length > 0;
 
     return (
-        <div className={cn("space-y-4", className)}>
+        <div className={cn("group", className)}>
             {/* Parent comment */}
             <CommentItem comment={comment} onReply={onReply} />
 
             {/* Replies */}
             {hasReplies && (
-                <div className="space-y-3 border-l-2 border-[var(--border)] ml-4 pl-2">
+                <div className="relative mt-4 ml-6 pl-6 space-y-4">
+                    {/* Thread line */}
+                    <div className="absolute left-0 top-0 bottom-4 w-[2px] bg-[var(--border)] rounded-full opacity-40" />
+
                     {comment.replies!.map((reply) => (
-                        <CommentItem key={reply.id} comment={reply} isReply />
+                        <CommentItem
+                            key={reply.id}
+                            comment={reply}
+                            isReply
+                            className="relative"
+                        />
                     ))}
                 </div>
             )}

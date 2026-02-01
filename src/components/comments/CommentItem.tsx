@@ -54,60 +54,67 @@ export function CommentItem({
     const netVotes = upvoteCount - comment.downvotes;
 
     return (
-        <div className={cn("flex gap-3", isReply && "ml-12", className)}>
-            {/* Avatar */}
-            <Image
-                src={comment.author.avatar}
-                alt={comment.author.displayName}
-                width={isReply ? 28 : 36}
-                height={isReply ? 28 : 36}
-                className="rounded-full shrink-0"
-            />
+        <div className={cn("flex gap-4 items-start w-full", className)}>
+            {/* Avatar - larger and more visible */}
+            <div className="shrink-0">
+                <Image
+                    src={comment.author.avatar}
+                    alt={comment.author.displayName}
+                    width={isReply ? 32 : 40}
+                    height={isReply ? 32 : 40}
+                    className="rounded-full bg-neutral-800"
+                />
+            </div>
 
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-                {/* Header */}
-                <div className="flex items-center gap-2 mb-0.5 text-sm">
-                    <span className="font-semibold text-[var(--foreground)] hover:underline cursor-pointer">
+            {/* Content - more breathing room */}
+            <div className="flex-1 space-y-2">
+                {/* Header - better spacing */}
+                <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-bold text-[var(--foreground)] hover:text-[var(--accent-primary)] cursor-pointer transition-colors">
                         {comment.author.displayName}
                     </span>
-                    <span className="text-[var(--foreground-muted)] text-xs">
+                    {comment.author.isVerified && (
+                        <span className="text-[var(--accent-primary)]">✓</span>
+                    )}
+                    <span className="text-xs text-[var(--foreground-muted)]">
                         {formatTimeAgo(comment.createdAt)}
                     </span>
                 </div>
 
-                {/* Text */}
-                <p className="text-[15px] text-[var(--foreground)] leading-relaxed text-pretty">
+                {/* Text - much more readable */}
+                <p className="text-sm text-[var(--foreground)] leading-relaxed break-words">
                     {comment.text}
                 </p>
 
-                {/* Actions */}
-                <div className="flex items-center gap-5 mt-2">
+                {/* Actions - better spacing */}
+                <div className="flex items-center gap-4 pt-1">
                     {/* Vote buttons */}
-                    <div className="flex items-center gap-1 group">
+                    <div className="flex items-center gap-2">
                         <button
                             onClick={handleUpvote}
                             className={cn(
-                                "p-0.5 -ml-1 rounded hover:bg-[var(--muted)] transition-colors",
-                                isUpvoted && "text-[var(--upvote)]"
+                                "flex items-center justify-center p-1.5 rounded-full hover:bg-[var(--muted)] transition-colors",
+                                isUpvoted ? "text-[var(--upvote)]" : "text-[var(--foreground-muted)]"
                             )}
+                            title="Upvote"
                         >
-                            <ArrowBigUp className={cn("w-5 h-5 transition-transform group-hover:-translate-y-0.5", isUpvoted && "fill-current")} />
+                            <ArrowBigUp className={cn("w-4 h-4", isUpvoted && "fill-current")} />
                         </button>
                         <span className={cn(
-                            "text-xs font-medium min-w-[20px] text-center",
-                            isUpvoted ? "text-[var(--upvote)]" : "text-[var(--foreground-muted)]"
+                            "text-sm font-semibold min-w-[24px] text-center",
+                            isUpvoted ? "text-[var(--upvote)]" : isDownvoted ? "text-[var(--downvote)]" : "text-[var(--foreground-muted)]"
                         )}>
                             {formatCount(netVotes)}
                         </span>
                         <button
                             onClick={handleDownvote}
                             className={cn(
-                                "p-0.5 rounded hover:bg-[var(--muted)] transition-colors",
-                                isDownvoted && "text-[var(--downvote)]"
+                                "flex items-center justify-center p-1.5 rounded-full hover:bg-[var(--muted)] transition-colors",
+                                isDownvoted ? "text-[var(--downvote)]" : "text-[var(--foreground-muted)]"
                             )}
+                            title="Downvote"
                         >
-                            <ArrowBigDown className={cn("w-5 h-5 transition-transform group-hover:translate-y-0.5", isDownvoted && "fill-current")} />
+                            <ArrowBigDown className={cn("w-4 h-4", isDownvoted && "fill-current")} />
                         </button>
                     </div>
 
@@ -115,16 +122,11 @@ export function CommentItem({
                     {!isReply && (
                         <button
                             onClick={() => onReply?.(comment.id)}
-                            className="text-xs font-medium text-[var(--foreground-muted)] hover:text-[var(--foreground)] transition-colors"
+                            className="text-sm font-semibold text-[var(--foreground-muted)] hover:text-[var(--foreground)] transition-colors"
                         >
                             Reply
                         </button>
                     )}
-
-                    {/* More options - hidden by default, visible on hover */}
-                    <button className="text-[var(--foreground-subtle)] opacity-0 group-hover:opacity-100 transition-opacity">
-                        <MoreHorizontal className="w-4 h-4" />
-                    </button>
                 </div>
             </div>
         </div>

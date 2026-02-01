@@ -1,14 +1,15 @@
 "use client";
 
-import { MemeCard } from "@/components/feed";
+import { FeedContainer } from "@/components/feed/FeedContainer";
 import { TagFilter } from "@/components/discovery/TagFilter";
 import { mockMemes, mockTags } from "@/data/mockMemes";
 import { cn } from "@/lib/utils";
+import { Stack } from "@/components/layout";
 
 // =============================================================================
 // HOME PAGE
 // The main feed where users discover memes.
-// Connected to mock data for realistic preview.
+// Uses the new fluid layout system for app-like responsive behavior.
 // =============================================================================
 
 const feedTabs = [
@@ -23,46 +24,36 @@ const feedTabs = [
 
 export default function HomePage() {
   return (
-    <div className="feed-container">
-      {/* Page header */}
-      <header className="pt-4 pb-6">
-        <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
-          For You
-        </h1>
-        <p className="mt-1 text-sm text-[var(--foreground-muted)]">
-          Fresh memes, just for you 😂
-        </p>
-      </header>
+    <div className="feed-container" style={{ paddingLeft: '1rem', paddingRight: '1rem', paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
+      <Stack space="lg">
+        {/* Page header */}
+        <header style={{ paddingBlockStart: "var(--space-sm)" }}>
+          <h1 className="text-2xl font-bold text-[var(--foreground)] tracking-tight">
+            For You
+          </h1>
+          <p
+            className="text-sm text-[var(--foreground-muted)]"
+            style={{ marginBlockStart: "var(--space-3xs)" }}
+          >
+            Fresh memes, just for you 😂
+          </p>
+        </header>
 
-      {/* Tag filters - horizontal scroll */}
-      <div className="mb-6 -mx-4 px-4 sm:mx-0 sm:px-0">
-        <TagFilter
-          tags={[
-            { id: "trending", label: "Trending", emoji: "🔥" },
-            ...mockTags.map(t => ({ id: t.slug, label: t.name, emoji: t.emoji }))
-          ]}
-          onSelectTag={(id) => console.log("Selected tag:", id)}
-          selectedTag="all"
-        />
-      </div>
-
-      {/* Feed - meme cards with optimized spacing */}
-      <div className="flex flex-col gap-10">
-        {mockMemes.map((meme, index) => (
-          <MemeCard
-            key={meme.id}
-            meme={meme}
-            priority={index < 2}
+        {/* Tag filters - horizontal scroll */}
+        <div className="-mx-4 px-4 sm:mx-0 sm:px-0">
+          <TagFilter
+            tags={[
+              { id: "trending", label: "Trending", emoji: "🔥" },
+              ...mockTags.map(t => ({ id: t.slug, label: t.name, emoji: t.emoji }))
+            ]}
+            onSelectTag={(id) => console.log("Selected tag:", id)}
+            selectedTag="all"
           />
-        ))}
-      </div>
+        </div>
 
-      {/* Load more indicator */}
-      <div className="py-12 text-center">
-        <p className="text-sm text-[var(--foreground-muted)]">
-          Scroll for more 👇
-        </p>
-      </div>
+        {/* Feed - meme cards with optimized spacing */}
+        <FeedContainer />
+      </Stack>
     </div>
   );
 }

@@ -41,6 +41,14 @@ export function UploadForm() {
             alert("Please upload an image file");
             return;
         }
+
+        // File size validation (5MB max)
+        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        if (file.size > maxSize) {
+            alert("File too large! Maximum size is 5MB");
+            return;
+        }
+
         const reader = new FileReader();
         reader.onload = () => {
             setPreview(reader.result as string);

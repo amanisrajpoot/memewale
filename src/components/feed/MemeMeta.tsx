@@ -2,7 +2,8 @@
 
 import { cn } from "@/lib/utils";
 import { formatTimeAgo, formatCount, type Creator } from "@/data/mockMemes";
-import { BadgeCheck, MoreHorizontal } from "lucide-react";
+import { MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/Button";
 import Image from "next/image";
 
 // =============================================================================
@@ -30,64 +31,70 @@ export function MemeMeta({
     className,
 }: MemeMetaProps) {
     return (
-        <div className={cn("flex items-center gap-3", className)}>
-            {/* Avatar */}
-            <button
-                onClick={onCreatorClick}
-                className="shrink-0 rounded-full overflow-hidden ring-2 ring-transparent hover:ring-[var(--accent-primary)] transition-all"
-            >
-                <Image
-                    src={creator.avatar}
-                    alt={creator.displayName}
-                    width={44}
-                    height={44}
-                    className="rounded-full"
-                />
-            </button>
-
-            {/* Username & timestamp */}
-            <div className="flex-1 min-w-0">
+        <div className={cn("flex items-center justify-between gap-4", className)}>
+            {/* Left: Creator info */}
+            <div className="flex items-center gap-4 min-w-0 flex-1">
+                {/* Avatar */}
                 <button
                     onClick={onCreatorClick}
-                    className="flex items-center gap-1 hover:text-[var(--accent-primary)] transition-colors"
+                    className="shrink-0 rounded-full ring-2 ring-[var(--border)] hover:ring-[var(--accent-primary)] transition-all overflow-hidden"
                 >
-                    <span className="font-semibold text-[var(--foreground)] truncate">
-                        {creator.displayName}
-                    </span>
-                    {creator.isVerified && (
-                        <BadgeCheck className="w-4 h-4 text-[var(--accent-primary)] shrink-0" />
-                    )}
+                    <Image
+                        src={creator.avatar}
+                        alt={creator.displayName}
+                        width={44}
+                        height={44}
+                        className="rounded-full object-cover aspect-square"
+                    />
                 </button>
-                <div className="flex items-center gap-2 text-sm text-[var(--foreground-muted)]">
-                    <span>@{creator.username}</span>
-                    <span>·</span>
-                    <span>{formatTimeAgo(createdAt)}</span>
+
+                {/* Name & time */}
+                <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                    <button
+                        onClick={onCreatorClick}
+                        className="flex items-center gap-2 group"
+                    >
+                        <span className="font-bold text-sm text-[var(--foreground)] group-hover:text-[var(--accent-primary)] transition-colors truncate">
+                            {creator.displayName}
+                        </span>
+                        {creator.isVerified && (
+                            <span className="text-[var(--accent-primary)] shrink-0 text-base">
+                                ✓
+                            </span>
+                        )}
+                    </button>
+                    <span className="text-xs text-[var(--foreground-muted)]">
+                        @{creator.username} · {formatTimeAgo(createdAt)}
+                    </span>
                 </div>
             </div>
 
-            {/* Follow button */}
-            {!isFollowing && (
-                <button
+            {/* Right: Actions */}
+            <div className="flex items-center gap-3 shrink-0">
+                {/* Follow button */}
+                <Button
+                    variant={isFollowing ? "secondary" : "primary"}
+                    size="sm"
                     onClick={onFollowClick}
                     className={cn(
-                        "flex items-center justify-center h-8 px-4 rounded-full text-sm font-semibold transition-colors",
-                        "bg-[var(--accent-primary)] text-[hsl(220,25%,10%)]",
-                        "hover:bg-[var(--accent-primary-hover)]",
-                        "active:scale-95"
+                        "px-5 py-2 text-sm font-bold min-w-[90px] transition-all",
+                        isFollowing && "bg-[var(--muted)] hover:bg-[var(--muted-hover)] text-[var(--foreground)]"
                     )}
                 >
-                    Follow
-                </button>
-            )}
+                    {isFollowing ? "Following" : "Follow"}
+                </Button>
 
-            {/* More options */}
-            <button
-                onClick={onMoreClick}
-                className="p-2 rounded-full hover:bg-[var(--muted)] transition-colors"
-                aria-label="More options"
-            >
-                <MoreHorizontal className="w-5 h-5 text-[var(--foreground-muted)]" />
-            </button>
+                {/* More options */}
+                <Button
+                    variant="icon"
+                    size="sm"
+                    onClick={onMoreClick}
+                    className="p-2.5"
+                    aria-label="More options"
+                >
+                    <MoreHorizontal size={20} />
+                </Button>
+            </div>
         </div>
     );
 }

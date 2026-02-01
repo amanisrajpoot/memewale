@@ -62,29 +62,29 @@ export function MemeActions({
                 <button
                     onClick={onUpvote}
                     className={cn(
-                        "flex items-center gap-1 px-3 py-2 rounded-l-full transition-colors",
+                        "flex items-center gap-1 px-3 py-2 rounded-l-full transition-all",
                         "hover:bg-[var(--muted-hover)]",
-                        isUpvoted && "text-[var(--upvote)]"
+                        isUpvoted && "bg-[var(--upvote)]/20 text-[var(--upvote)]"
                     )}
                     aria-label="Upvote"
                 >
                     <ArrowBigUp
-                        className={cn("w-5 h-5", isUpvoted && "fill-current")}
+                        className={cn("w-5 h-5 transition-all", isUpvoted && "fill-current scale-110")}
                     />
-                    <span className="text-sm font-medium">{formatCount(netVotes)}</span>
+                    <span className={cn("text-sm font-medium", isUpvoted && "font-bold")}>{formatCount(netVotes)}</span>
                 </button>
                 <div className="w-px h-5 bg-[var(--border)]" />
                 <button
                     onClick={onDownvote}
                     className={cn(
-                        "flex items-center px-3 py-2 rounded-r-full transition-colors",
+                        "flex items-center px-3 py-2 rounded-r-full transition-all",
                         "hover:bg-[var(--muted-hover)]",
-                        isDownvoted && "text-[var(--downvote)]"
+                        isDownvoted && "bg-[var(--downvote)]/20 text-[var(--downvote)]"
                     )}
                     aria-label="Downvote"
                 >
                     <ArrowBigDown
-                        className={cn("w-5 h-5", isDownvoted && "fill-current")}
+                        className={cn("w-5 h-5 transition-all", isDownvoted && "fill-current scale-110")}
                     />
                 </button>
             </div>
@@ -121,13 +121,13 @@ export function MemeActions({
             <button
                 onClick={onSave}
                 className={cn(
-                    "p-2 rounded-full transition-colors",
+                    "p-2 rounded-full transition-all",
                     "hover:bg-[var(--muted)]",
-                    isSaved && "text-[var(--save)]"
+                    isSaved && "bg-[var(--save)]/20 text-[var(--save)]"
                 )}
                 aria-label={isSaved ? "Unsave" : "Save"}
             >
-                <Bookmark className={cn("w-5 h-5", isSaved && "fill-current")} />
+                <Bookmark className={cn("w-5 h-5 transition-all", isSaved && "fill-current scale-110")} />
             </button>
 
             {/* Download button */}

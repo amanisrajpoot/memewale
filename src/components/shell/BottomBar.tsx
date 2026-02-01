@@ -26,10 +26,10 @@ interface NavItem {
 
 const navItems: NavItem[] = [
     { href: "/", label: "Feed", icon: Home },
-    { href: "/trending", label: "Trending", icon: TrendingUp },
+    { href: "/search?q=trending", label: "Trending", icon: TrendingUp },
     { href: "/submit", label: "Post", icon: PlusSquare, isSpecial: true },
     { href: "/collections", label: "Saved", icon: Bookmark },
-    { href: "/profile", label: "Profile", icon: User },
+    { href: "/u/memelord42", label: "Profile", icon: User },
 ];
 
 export function BottomBar() {

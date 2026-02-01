@@ -136,7 +136,7 @@ export function Drawer({
                     "lg:inset-auto lg:top-1/2 lg:left-1/2 lg:-translate-x-1/2 lg:-translate-y-1/2",
                     "z-[var(--z-modal)]",
                     // Size
-                    "w-full lg:max-w-xl",
+                    "w-full lg:max-w-2xl",
                     // Reset height on desktop to allow auto-height or specific modal height
                     // Mobile uses fixed heights, desktop uses auto or max
                     height === "full" ? "h-[calc(100vh-3rem)] lg:h-auto lg:max-h-[85vh]" : heightStyles[height],
@@ -170,11 +170,11 @@ export function Drawer({
 
                 {/* Header */}
                 {(title || showCloseButton) && (
-                    <div className="flex items-center justify-between px-4 pb-3">
+                    <div className="flex items-center justify-between px-6 pb-4 border-b border-[var(--border)]">
                         {title && (
                             <h2
                                 id="drawer-title"
-                                className="text-[var(--text-lg)] font-semibold text-[var(--foreground)]"
+                                className="text-lg font-bold text-[var(--foreground)]"
                             >
                                 {title}
                             </h2>
@@ -193,8 +193,8 @@ export function Drawer({
                     </div>
                 )}
 
-                {/* Content */}
-                <div className="flex-1 overflow-y-auto px-4 pb-4">{children}</div>
+                {/* Content - no default padding, let children control their own layout */}
+                <div className="flex-1 overflow-hidden flex flex-col px-6">{children}</div>
             </div>
         </div>
     );
