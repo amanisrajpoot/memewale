@@ -9,7 +9,10 @@ import {
     PlusSquare,
     Bookmark,
     User,
+    LogIn
 } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useAuthModalStore } from "@/store/useAuthModalStore";
 
 // =============================================================================
 // BOTTOM BAR
@@ -22,18 +25,26 @@ interface NavItem {
     label: string;
     icon: React.ComponentType<{ size?: number; className?: string }>;
     isSpecial?: boolean;
+    onClick?: () => void;
 }
-
-const navItems: NavItem[] = [
-    { href: "/", label: "Feed", icon: Home },
-    { href: "/search?q=trending", label: "Trending", icon: TrendingUp },
-    { href: "/submit", label: "Post", icon: PlusSquare, isSpecial: true },
-    { href: "/collections", label: "Saved", icon: Bookmark },
-    { href: "/u/memelord42", label: "Profile", icon: User },
-];
 
 export function BottomBar() {
     const pathname = usePathname();
+    const { user } = useAuthStore();
+    const { openModal } = useAuthModalStore();
+
+    const navItems: NavItem[] = [
+        { href: "/", label: "Feed", icon: Home },
+        { href: "/?sort=trending", label: "Trending", icon: TrendingUp }, // Changed to query param sort as per sidebar
+        { href: "/submit", label: "Post", icon: PlusSquare, isSpecial: true },
+        { href: "/collections", label: "Saved", icon: Bookmark },
+        {
+            href: user ? (user.user_metadata?.username ? `/u/${user.user_metadata.username}` : '/settings') : '#',
+            label: user ? "Profile" : "Login",
+            icon: user ? User : LogIn,
+            onClick: user ? undefined : () => openModal('login')
+        },
+    ];
 
     return (
         <nav
@@ -64,7 +75,7 @@ export function BottomBar() {
                     if (item.isSpecial) {
                         return (
                             <Link
-                                key={item.href}
+                                key={item.label}
                                 href={item.href}
                                 className={cn(
                                     // Size
@@ -87,9 +98,32 @@ export function BottomBar() {
                         );
                     }
 
+                    // Handle Click for Login
+                    if (item.onClick) {
+                        return (
+                            <button
+                                key={item.label}
+                                onClick={item.onClick}
+                                className={cn(
+                                    // Size & layout
+                                    "flex flex-col items-center justify-center gap-1",
+                                    "flex-1",
+                                    "py-2",
+                                    // Text
+                                    "text-[var(--text-xs)]",
+                                    "transition-colors duration-[var(--transition-fast)]",
+                                    "text-[var(--foreground-muted)]"
+                                )}
+                            >
+                                <Icon size={22} className="transition-transform duration-[var(--transition-fast)]" />
+                                <span className="font-medium">{item.label}</span>
+                            </button>
+                        );
+                    }
+
                     return (
                         <Link
-                            key={item.href}
+                            key={item.label}
                             href={item.href}
                             className={cn(
                                 // Size & layout

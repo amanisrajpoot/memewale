@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Search, User, Menu } from "lucide-react";
+import { Search, User, Menu, Bell } from "lucide-react";
 import { Button } from "@/components/ui";
 import { SearchBar } from "@/components/discovery/SearchBar";
 import { useAuthStore } from "@/store/useAuthStore";
-import { LoginModal } from "@/components/auth/LoginModal";
+import { useAuthModalStore } from "@/store/useAuthModalStore";
 import { useState } from "react";
 
 // =============================================================================
@@ -23,7 +23,7 @@ export interface TopNavProps {
 
 export function TopNav({ onMenuClick, onSearchClick }: TopNavProps) {
     const { user, isAuthenticated, logout } = useAuthStore();
-    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+    const { openModal } = useAuthModalStore();
 
     return (
         <header
@@ -102,6 +102,19 @@ export function TopNav({ onMenuClick, onSearchClick }: TopNavProps) {
                         <Search size={20} />
                     </Button>
 
+                    {/* Notifications Button */}
+                    <Link href="/notifications">
+                        <Button
+                            variant="icon"
+                            size="sm"
+                            aria-label="Notifications"
+                            className="relative"
+                        >
+                            <Bell size={20} />
+                            <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-[var(--background)]" />
+                        </Button>
+                    </Link>
+
                     {/* User menu / Login button */}
                     {isAuthenticated && user ? (
                         <div className="hidden sm:flex items-center gap-3">
@@ -119,7 +132,7 @@ export function TopNav({ onMenuClick, onSearchClick }: TopNavProps) {
                             variant="secondary"
                             size="sm"
                             className="hidden sm:flex"
-                            onClick={() => setIsLoginModalOpen(true)}
+                            onClick={() => openModal('login')}
                         >
                             <User size={18} />
                             <span>Login</span>
@@ -131,7 +144,7 @@ export function TopNav({ onMenuClick, onSearchClick }: TopNavProps) {
                         variant="icon"
                         size="sm"
                         className="sm:hidden"
-                        onClick={() => !isAuthenticated && setIsLoginModalOpen(true)}
+                        onClick={() => !isAuthenticated && openModal('login')}
                         aria-label="Account"
                     >
                         {isAuthenticated ? (
@@ -147,11 +160,7 @@ export function TopNav({ onMenuClick, onSearchClick }: TopNavProps) {
                 </div>
             </div>
 
-            {/* Login Modal */}
-            <LoginModal
-                isOpen={isLoginModalOpen}
-                onClose={() => setIsLoginModalOpen(false)}
-            />
+
         </header >
     );
 }

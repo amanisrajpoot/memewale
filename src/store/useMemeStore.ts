@@ -1,6 +1,9 @@
 import { create } from 'zustand';
-import { mockMemes, type Meme } from '@/data/mockMemes';
+import { createClient } from '@/lib/supabase/client';
+import { type Meme } from '@/data/mockMemes';
 import type { Comment } from '@/data/mockComments';
+
+const supabase = createClient();
 
 interface MemeInteraction {
     memeId: string;
@@ -15,21 +18,11 @@ interface MemeInteraction {
 
 interface MemeStore {
     interactions: Record<string, MemeInteraction>;
-
-    // Initialize meme interactions
     initializeMeme: (meme: Meme, comments: Comment[]) => void;
-
-    // Voting
-    upvote: (memeId: string) => void;
-    downvote: (memeId: string) => void;
-
-    // Save
-    toggleSave: (memeId: string) => void;
-
-    // Comments
+    upvote: (memeId: string, userId: string) => Promise<void>;
+    downvote: (memeId: string, userId: string) => Promise<void>;
+    toggleSave: (memeId: string, userId: string) => Promise<void>;
     addComment: (memeId: string, comment: Comment) => void;
-
-    // Getters
     getMemeInteraction: (memeId: string) => MemeInteraction | undefined;
 }
 
@@ -47,27 +40,25 @@ export const useMemeStore = create<MemeStore>((set, get) => ({
                         isUpvoted: meme.isUpvoted || false,
                         isDownvoted: meme.isDownvoted || false,
                         isSaved: meme.isSaved || false,
-                        upvotes: meme.upvotes,
-                        downvotes: meme.downvotes,
+                        upvotes: meme.upvotes || 0,
+                        downvotes: meme.downvotes || 0,
                         comments: comments,
-                        commentCount: meme.comments
+                        commentCount: meme.comments || 0
                     }
                 }
             });
         }
     },
 
-    upvote: (memeId: string) => {
+    upvote: async (memeId: string, userId: string) => {
         const { interactions } = get();
         const interaction = interactions[memeId];
-        if (!interaction) {
-            console.warn(`Attempted to upvote uninitialized meme: ${memeId}`);
-            return;
-        }
+        if (!interaction) return;
 
         const wasUpvoted = interaction.isUpvoted;
         const wasDownvoted = interaction.isDownvoted;
 
+        // Optimistic Update
         set({
             interactions: {
                 ...interactions,
@@ -80,19 +71,35 @@ export const useMemeStore = create<MemeStore>((set, get) => ({
                 }
             }
         });
+
+        // Database Call
+        try {
+            if (wasUpvoted) {
+                // Remove upvote
+                await supabase.from('meme_votes').delete().match({ user_id: userId, meme_id: memeId });
+            } else {
+                // Remove existing downvote first if any (to be safe, though constraint might handle it or error)
+                if (wasDownvoted) {
+                    await supabase.from('meme_votes').delete().match({ user_id: userId, meme_id: memeId });
+                }
+                // Add upvote
+                await supabase.from('meme_votes').upsert({ user_id: userId, meme_id: memeId, value: 1 });
+            }
+        } catch (error) {
+            console.error('Upvote failed:', error);
+            // In a real app, revert state here
+        }
     },
 
-    downvote: (memeId: string) => {
+    downvote: async (memeId: string, userId: string) => {
         const { interactions } = get();
         const interaction = interactions[memeId];
-        if (!interaction) {
-            console.warn(`Attempted to downvote uninitialized meme: ${memeId}`);
-            return;
-        }
+        if (!interaction) return;
 
         const wasUpvoted = interaction.isUpvoted;
         const wasDownvoted = interaction.isDownvoted;
 
+        // Optimistic Update
         set({
             interactions: {
                 ...interactions,
@@ -105,41 +112,61 @@ export const useMemeStore = create<MemeStore>((set, get) => ({
                 }
             }
         });
+
+        // Database Call
+        try {
+            if (wasDownvoted) {
+                await supabase.from('meme_votes').delete().match({ user_id: userId, meme_id: memeId });
+            } else {
+                if (wasUpvoted) {
+                    await supabase.from('meme_votes').delete().match({ user_id: userId, meme_id: memeId });
+                }
+                await supabase.from('meme_votes').upsert({ user_id: userId, meme_id: memeId, value: -1 });
+            }
+        } catch (error) {
+            console.error('Downvote failed:', error);
+        }
     },
 
-    toggleSave: (memeId: string) => {
+    toggleSave: async (memeId: string, userId: string) => {
         const { interactions } = get();
         const interaction = interactions[memeId];
-        if (!interaction) {
-            console.warn(`Attempted to save uninitialized meme: ${memeId}`);
-            return;
-        }
+        if (!interaction) return;
+
+        const wasSaved = interaction.isSaved;
 
         set({
             interactions: {
                 ...interactions,
                 [memeId]: {
                     ...interaction,
-                    isSaved: !interaction.isSaved
+                    isSaved: !wasSaved
                 }
             }
         });
+
+        try {
+            if (wasSaved) {
+                await supabase.from('saved_memes').delete().match({ user_id: userId, meme_id: memeId });
+            } else {
+                await supabase.from('saved_memes').insert({ user_id: userId, meme_id: memeId });
+            }
+        } catch (error) {
+            console.error('Save failed:', error);
+        }
     },
 
     addComment: (memeId: string, comment: Comment) => {
         const { interactions } = get();
         const interaction = interactions[memeId];
-        if (!interaction) {
-            console.warn(`Attempted to comment on uninitialized meme: ${memeId}`);
-            return;
-        }
+        if (!interaction) return;
 
         set({
             interactions: {
                 ...interactions,
                 [memeId]: {
                     ...interaction,
-                    comments: [comment, ...interaction.comments],
+                    comments: [...interaction.comments, comment],
                     commentCount: interaction.commentCount + 1
                 }
             }

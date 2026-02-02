@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import { AppShell } from "@/components/shell";
 import { ToastContainer } from "@/components/ui/ToastContainer";
+import { AuthProvider } from "@/components/auth/AuthProvider";
+import { AuthModal } from "@/components/auth/AuthModal";
 import "./globals.css";
 
 const inter = Inter({
@@ -61,8 +63,11 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.variable}>
       <body className="antialiased">
-        <AppShell>{children}</AppShell>
-        <ToastContainer />
+        <AuthProvider>
+          <AppShell>{children}</AppShell>
+          <ToastContainer />
+          <AuthModal />
+        </AuthProvider>
       </body>
     </html>
   );

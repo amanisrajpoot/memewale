@@ -13,6 +13,7 @@ export interface EmptyStateProps {
         onClick: () => void;
     };
     className?: string;
+    children?: React.ReactNode;
 }
 
 export function EmptyState({
@@ -21,7 +22,8 @@ export function EmptyState({
     title,
     description,
     action,
-    className
+    className,
+    children
 }: EmptyStateProps) {
     return (
         <div className={cn(
@@ -56,6 +58,8 @@ export function EmptyState({
                     {action.label}
                 </button>
             )}
+
+            {children}
         </div>
     );
 }

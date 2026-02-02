@@ -9,23 +9,22 @@ import {
     Share2,
     Bookmark,
     Download,
+    Eye,
 } from "lucide-react";
 
-// =============================================================================
-// MEME ACTIONS
-// Interactive buttons: upvote, downvote, comment, share, save, download.
-// =============================================================================
+// ...
 
 export interface MemeActionsProps {
     upvotes: number;
     downvotes: number;
     comments: number;
     shares: number;
+    views?: number; // New optional prop
     isUpvoted?: boolean;
     isDownvoted?: boolean;
     isSaved?: boolean;
     onUpvote?: () => void;
-    onDownvote?: () => void;
+    onDownvote?: () => void; // ... rest is same
     onComment?: () => void;
     onShare?: () => void;
     onSave?: () => void;
@@ -37,6 +36,7 @@ export function MemeActions({
     upvotes,
     downvotes,
     comments,
+    views = 0,
     isUpvoted = false,
     isDownvoted = false,
     isSaved = false,
@@ -57,8 +57,23 @@ export function MemeActions({
                 className
             )}
         >
+            {/* View Count (Left aligned, subtle) */}
+            {views > 0 && (
+                <div className="flex items-center gap-1.5 mr-auto px-2 py-2 text-[var(--foreground-muted)]">
+                    <Eye className="w-4 h-4" />
+                    <span className="text-xs font-medium">{formatCount(views)}</span>
+                </div>
+            )}
+
+            {/* Spacer if no views, otherwise views takes left spot so we need flex adjustment */}
+            {views === 0 && <div className="flex-1 lg:hidden" />}
+            {/* Actually better layout: Put views on far left, Actions on right. 
+               But existing layout has "Spacer" in middle. Let's adapt.
+            */}
+
             {/* Upvote/Downvote group */}
             <div className="flex items-center rounded-full bg-[var(--muted)]">
+                {/* ... existing buttons ... */}
                 <button
                     onClick={onUpvote}
                     className={cn(
@@ -114,8 +129,6 @@ export function MemeActions({
                 <Share2 className="w-5 h-5" />
             </button>
 
-            {/* Spacer */}
-            <div className="flex-1" />
 
             {/* Save button */}
             <button

@@ -3,11 +3,17 @@
 import { cn } from "@/lib/utils";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
 import { useState, useRef } from "react";
+import { useToast } from "@/hooks/useToast";
 
-export function UploadForm() {
+interface UploadFormProps {
+    onFileSelect?: (file: File) => void;
+}
+
+export function UploadForm({ onFileSelect }: UploadFormProps) {
     const [dragActive, setDragActive] = useState(false);
     const [preview, setPreview] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const { addToast } = useToast();
 
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
@@ -37,16 +43,21 @@ export function UploadForm() {
 
     const handleFile = (file: File) => {
         // Basic validation
+        // Basic validation
         if (!file.type.startsWith("image/")) {
-            alert("Please upload an image file");
+            addToast("Please upload an image file", "error");
             return;
         }
 
         // File size validation (5MB max)
         const maxSize = 5 * 1024 * 1024; // 5MB in bytes
         if (file.size > maxSize) {
-            alert("File too large! Maximum size is 5MB");
+            addToast("File too large! Maximum size is 5MB", "error");
             return;
+        }
+
+        if (onFileSelect) {
+            onFileSelect(file);
         }
 
         const reader = new FileReader();
@@ -70,7 +81,7 @@ export function UploadForm() {
                     <img
                         src={preview}
                         alt="Upload preview"
-                        className="w-full h-auto max-h-[500px] object-contain"
+                        className="w-full h-[300px] object-contain bg-[var(--background-base)]"
                     />
                     <button
                         type="button"

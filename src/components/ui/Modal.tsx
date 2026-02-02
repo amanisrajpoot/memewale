@@ -136,7 +136,7 @@ export function Modal({
             >
                 {/* Header */}
                 {(title || showCloseButton) && (
-                    <div className="flex items-start justify-between p-6 pb-0">
+                    <div className="flex items-start justify-between p-8 pb-2">
                         <div className="flex-1 pr-4">
                             {title && (
                                 <h2
@@ -169,7 +169,7 @@ export function Modal({
                 )}
 
                 {/* Content */}
-                <div className="p-6">{children}</div>
+                <div className="p-8 pt-6">{children}</div>
             </div>
         </div>
     );

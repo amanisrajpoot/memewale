@@ -8,32 +8,86 @@ import { MemeSkeleton } from "@/components/feed/MemeSkeleton";
 import { mockMemes } from "@/data/mockMemes";
 import { cn } from "@/lib/utils";
 
-export function FeedContainer() {
-    const [items, setItems] = useState(mockMemes);
+import { createClient } from "@/lib/supabase/client";
+import { useToast } from "@/hooks/useToast";
+
+// Mapper function to convert DB result to Meme type
+const mapMeme = (item: any): any => ({
+    id: item.id,
+    caption: item.caption,
+    mediaUrl: item.media_url, // Changed from item.url
+    mediaType: item.media_type || "image",
+    creator: {
+        id: item.author.id,
+        username: item.author.username,
+        displayName: item.author.full_name || item.author.username,
+        // Fallback to UI avatars if no avatar
+        avatar: item.author.avatar_url || `https://ui-avatars.com/api/?name=${item.author.username}&background=random`,
+        isVerified: item.author.is_verified || false,
+    },
+    upvotes: item.upvote_count || 0,
+    downvotes: item.downvote_count || 0,
+    comments: item.comment_count || 0,
+    shares: item.share_count || 0,
+    createdAt: item.created_at,
+    tags: [], // Tags needs a join, keeping empty for now
+    isUpvoted: false, // Needs user-specific fetch
+    isDownvoted: false,
+    isSaved: false
+});
+
+export function FeedContainer({ sortBy = 'latest' }: { sortBy?: 'latest' | 'trending' }) {
+    const [items, setItems] = useState<any[]>([]);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
+    const supabase = createClient();
+    const { addToast } = useToast();
 
-    // Simulate initial load
+    // Initial Load
     useEffect(() => {
-        const timer = setTimeout(() => {
+        setIsInitialLoading(true);
+        const fetchMemes = async () => {
+            let query = supabase
+                .from('memes')
+                .select(`
+                    *,
+                    author:profiles!memes_author_id_fkey(*)
+                `);
+
+            // Apply Sorting
+            if (sortBy === 'trending') {
+                query = query.order('upvote_count', { ascending: false });
+            } else {
+                query = query.order('created_at', { ascending: false });
+            }
+
+            const { data, error } = await query.limit(10);
+
+            if (error) {
+                console.error("Supabase Fetch Error:", JSON.stringify(error, null, 2));
+                addToast("Failed to load feed", "error");
+            } else {
+                setItems((data || []).map(mapMeme));
+            }
             setIsInitialLoading(false);
-        }, 1000);
-        return () => clearTimeout(timer);
-    }, []);
+        };
 
-    // Simulated load more
-    const loadMore = () => {
-        console.log("Loading more memes...");
-        // Append duplicate memes with new IDs to simulate infinite content
-        const newMemes = mockMemes.map(m => ({
-            ...m,
-            id: `${m.id}-${Date.now()}-${Math.random()}`
-        }));
+        fetchMemes();
+    }, [sortBy]); // Re-fetch when sorting changes
 
-        // Artificial delay
-        setTimeout(() => {
-            setItems(prev => [...prev, ...newMemes]);
+    const loadMore = async () => {
+        // Simple pagination (cursor-based ideal, but offset for now)
+        const { data, error } = await supabase
+            .from('memes')
+            .select(`*, author:profiles(*)`)
+            .order('created_at', { ascending: false })
+            .range(items.length, items.length + 9);
+
+        if (!error && data?.length) {
+            setItems(prev => [...prev, ...data.map(mapMeme)]);
             setIsFetching(false);
-        }, 1500);
+        } else {
+            setIsFetching(false);
+        }
     };
 
     const { observerTarget, isFetching, setIsFetching } = useInfiniteScroll(loadMore);

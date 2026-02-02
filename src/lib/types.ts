@@ -225,7 +225,7 @@ export interface CreateCollectionForm {
 // COMPONENT PROP TYPES
 // =============================================================================
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "icon" | "danger";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "icon" | "danger" | "outline";
 export type ButtonSize = "sm" | "md" | "lg";
 
 export type CardVariant = "default" | "elevated" | "outlined";

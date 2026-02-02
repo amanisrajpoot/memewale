@@ -48,6 +48,13 @@ const variantStyles: Record<ButtonVariant, string> = {
     hover:opacity-90
     active:scale-[0.98]
   `,
+    outline: `
+    bg-transparent text-[var(--foreground)]
+    border border-[var(--border)]
+    hover:bg-[var(--muted)]
+    active:scale-[0.98]
+  `,
+
 };
 
 const sizeStyles: Record<ButtonSize, string> = {

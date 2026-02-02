@@ -1,30 +1,32 @@
 import { create } from 'zustand';
+import { User } from '@supabase/supabase-js';
 
-interface User {
+interface Profile {
     id: string;
-    name: string;
-    avatar: string;
     username: string;
+    full_name: string;
+    avatar_url: string;
+    // Add other fields as needed
 }
 
 interface AuthState {
     user: User | null;
+    profile: Profile | null;
     isAuthenticated: boolean;
-    login: () => void;
+    isLoading: boolean;
+    setUser: (user: User | null) => void;
+    setProfile: (profile: Profile | null) => void;
+    setIsLoading: (loading: boolean) => void;
     logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
     user: null,
+    profile: null,
     isAuthenticated: false,
-    login: () => set({
-        isAuthenticated: true,
-        user: {
-            id: '1',
-            name: 'Meme Lover',
-            avatar: 'https://i.pravatar.cc/150?u=memelover',
-            username: 'memelover69'
-        }
-    }),
-    logout: () => set({ isAuthenticated: false, user: null }),
+    isLoading: true,
+    setUser: (user) => set({ user, isAuthenticated: !!user }),
+    setProfile: (profile) => set({ profile }),
+    setIsLoading: (isLoading) => set({ isLoading }),
+    logout: () => set({ user: null, profile: null, isAuthenticated: false }),
 }));

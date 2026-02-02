@@ -16,6 +16,7 @@ export interface InputProps
     rightIcon?: React.ReactNode;
     error?: string;
     fullWidth?: boolean;
+    label?: string;
 }
 
 const sizeStyles: Record<InputSize, string> = {
@@ -55,70 +56,82 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             <div
                 className={cn("relative", fullWidth && "w-full", disabled && "opacity-50")}
             >
-                {/* Left icon */}
-                {leftIcon && (
-                    <div
-                        className={cn(
-                            "absolute left-3 top-1/2 -translate-y-1/2",
-                            "text-[var(--foreground-muted)]",
-                            "pointer-events-none"
-                        )}
+                {/* Label */}
+                {props.label && (
+                    <label
+                        className="block text-sm font-semibold text-[var(--foreground)] mb-1.5"
                     >
-                        {leftIcon}
-                    </div>
+                        {props.label}
+                    </label>
                 )}
 
-                <input
-                    ref={ref}
-                    type={type}
-                    disabled={disabled}
-                    className={cn(
-                        // Base styles
-                        "w-full",
-                        "bg-[var(--muted)]",
-                        "text-[var(--foreground)]",
-                        "placeholder:text-[var(--foreground-subtle)]",
-                        "rounded-[var(--radius-lg)]",
-                        "border border-[var(--border)]",
-                        "transition-all duration-[var(--transition-fast)]",
-
-                        // Focus styles
-                        "focus:outline-none focus:border-[var(--border-focus)]",
-                        "focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-opacity-20",
-
-                        // Hover styles
-                        "hover:border-[var(--foreground-subtle)]",
-
-                        // Error styles
-                        error && "border-[var(--error)] focus:border-[var(--error)] focus:ring-[var(--error)]",
-
-                        // Disabled styles
-                        "disabled:cursor-not-allowed",
-
-                        // Size styles
-                        sizeStyles[size],
-
-                        // Icon padding
-                        leftIcon && iconPaddingLeft[size],
-                        rightIcon && iconPaddingRight[size],
-
-                        // Custom className
-                        className
+                <div className="relative">
+                    {/* Left icon */}
+                    {leftIcon && (
+                        <div
+                            className={cn(
+                                "absolute left-3 top-1/2 -translate-y-1/2",
+                                "text-[var(--foreground-muted)]",
+                                "pointer-events-none",
+                                "z-10"
+                            )}
+                        >
+                            {leftIcon}
+                        </div>
                     )}
-                    {...props}
-                />
 
-                {/* Right icon */}
-                {rightIcon && (
-                    <div
+                    <input
+                        ref={ref}
+                        type={type}
+                        disabled={disabled}
                         className={cn(
-                            "absolute right-3 top-1/2 -translate-y-1/2",
-                            "text-[var(--foreground-muted)]"
+                            // Base styles
+                            "w-full",
+                            "bg-[var(--muted)]",
+                            "text-[var(--foreground)]",
+                            "placeholder:text-[var(--foreground-subtle)]",
+                            "rounded-[var(--radius-lg)]",
+                            "border border-[var(--border)]",
+                            "transition-all duration-[var(--transition-fast)]",
+
+                            // Focus styles
+                            "focus:outline-none focus:border-[var(--border-focus)]",
+                            "focus:ring-2 focus:ring-[var(--border-focus)] focus:ring-opacity-20",
+
+                            // Hover styles
+                            "hover:border-[var(--foreground-subtle)]",
+
+                            // Error styles
+                            error && "border-[var(--error)] focus:border-[var(--error)] focus:ring-[var(--error)]",
+
+                            // Disabled styles
+                            "disabled:cursor-not-allowed",
+
+                            // Size styles
+                            sizeStyles[size],
+
+                            // Icon padding
+                            leftIcon && iconPaddingLeft[size],
+                            rightIcon && iconPaddingRight[size],
+
+                            // Custom className
+                            className
                         )}
-                    >
-                        {rightIcon}
-                    </div>
-                )}
+                        {...props}
+                    />
+
+                    {/* Right icon */}
+                    {rightIcon && (
+                        <div
+                            className={cn(
+                                "absolute right-3 top-1/2 -translate-y-1/2",
+                                "text-[var(--foreground-muted)]"
+                            )}
+                        >
+                            {rightIcon}
+                        </div>
+                    )}
+                </div>
 
                 {/* Error message */}
                 {error && (

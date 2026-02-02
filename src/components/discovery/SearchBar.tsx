@@ -2,18 +2,29 @@
 
 import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useState, KeyboardEvent } from "react";
 
 export interface SearchBarProps {
     className?: string;
     placeholder?: string;
     onSearch?: (query: string) => void;
+    defaultValue?: string;
 }
 
 export function SearchBar({
     className,
     placeholder = "Search memes, creators, tags...",
     onSearch,
+    defaultValue = "",
 }: SearchBarProps) {
+    const [value, setValue] = useState(defaultValue);
+
+    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter" && value.trim()) {
+            onSearch?.(value.trim());
+        }
+    };
+
     return (
         <div className={cn("relative w-full max-w-md", className)}>
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -21,6 +32,9 @@ export function SearchBar({
             </div>
             <input
                 type="text"
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className={cn(
                     "flex h-10 w-full rounded-full border border-[var(--border)] bg-[var(--muted)] px-3 py-2 pl-10 text-sm ring-offset-[var(--background)]",
                     "file:border-0 file:bg-transparent file:text-sm file:font-medium",
@@ -30,7 +44,6 @@ export function SearchBar({
                     "transition-all duration-200 ease-in-out"
                 )}
                 placeholder={placeholder}
-                onChange={(e) => onSearch?.(e.target.value)}
             />
         </div>
     );

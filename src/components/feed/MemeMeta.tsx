@@ -72,17 +72,19 @@ export function MemeMeta({
             {/* Right: Actions */}
             <div className="flex items-center gap-3 shrink-0">
                 {/* Follow button */}
-                <Button
-                    variant={isFollowing ? "secondary" : "primary"}
-                    size="sm"
-                    onClick={onFollowClick}
-                    className={cn(
-                        "px-5 py-2 text-sm font-bold min-w-[90px] transition-all",
-                        isFollowing && "bg-[var(--muted)] hover:bg-[var(--muted-hover)] text-[var(--foreground)]"
-                    )}
-                >
-                    {isFollowing ? "Following" : "Follow"}
-                </Button>
+                {onFollowClick && (
+                    <Button
+                        variant={isFollowing ? "secondary" : "primary"}
+                        size="sm"
+                        onClick={onFollowClick}
+                        className={cn(
+                            "px-5 py-2 text-sm font-bold min-w-[90px] transition-all",
+                            isFollowing && "bg-[var(--muted)] hover:bg-[var(--muted-hover)] text-[var(--foreground)]"
+                        )}
+                    >
+                        {isFollowing ? "Following" : "Follow"}
+                    </Button>
+                )}
 
                 {/* More options */}
                 <Button

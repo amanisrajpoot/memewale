@@ -1,12 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { TopNav } from "./TopNav";
+import { MobileMenu } from "./MobileMenu";
+import { MobileSearch } from "./MobileSearch";
 import { BottomBar } from "./BottomBar";
 import { SideRail } from "./SideRail";
 import { Stack } from "@/components/layout";
-import { mockTrendingHashtags } from "@/data/mockTrending";
+import { TrendingSection } from "@/components/discovery/TrendingSection";
+import { TopCreators } from "@/components/discovery/TopCreators";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useUserStore } from "@/store/useUserStore";
 
 // =============================================================================
 // APP SHELL
@@ -19,11 +24,25 @@ export interface AppShellProps {
 }
 
 export function AppShell({ children }: AppShellProps) {
+    const { user } = useAuthStore();
+    const { init } = useUserStore();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+
+    useEffect(() => {
+        init(user?.id);
+    }, [user, init]);
     return (
         <div className="app-container">
+            <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
+            <MobileSearch isOpen={isMobileSearchOpen} onClose={() => setIsMobileSearchOpen(false)} />
+
             {/* Top Navigation - Mobile Only */}
             <div className="lg:hidden">
-                <TopNav />
+                <TopNav
+                    onMenuClick={() => setIsMobileMenuOpen(true)}
+                    onSearchClick={() => setIsMobileSearchOpen(true)}
+                />
             </div>
 
             {/* Main Layout Container - FULL WIDTH FLEX */}
@@ -53,12 +72,14 @@ export function AppShell({ children }: AppShellProps) {
 
                 {/* CENTER COLUMN (Main Content) - FLEXIBLE WIDTH */}
                 <main
-                    className="flex-1 min-h-screen border-r border-[var(--border)] border-l lg:border-l-0"
-                    style={{
-                        paddingBlockStart: "var(--safe-top)",
-                        paddingBlockEnd: "var(--safe-bottom)"
-                    }}
+                    className={cn(
+                        "flex-1 min-h-screen border-r border-[var(--border)] border-l lg:border-l-0",
+                        "lg:pt-[var(--safe-top)]",
+                        "pb-[var(--bottombar-height)] lg:pb-[var(--safe-bottom)]"
+                    )}
                 >
+                    {/* Mobile Header Spacer - Matches Nav Height to prevent overlap */}
+                    <div className="w-full lg:hidden shrink-0" style={{ height: "var(--nav-height)" }} aria-hidden="true" />
                     {children}
                 </main>
 
@@ -112,20 +133,26 @@ export function AppShell({ children }: AppShellProps) {
                             >
                                 <h3 className="font-bold text-[var(--foreground)]">Trending Now</h3>
                             </div>
-                            <div style={{ padding: "var(--space-sm)" }} className="space-y-3">
-                                {mockTrendingHashtags.map((hashtag) => (
-                                    <a
-                                        key={hashtag.id}
-                                        href={`/search?q=${hashtag.tag}`}
-                                        className="flex items-center justify-between p-2 rounded-lg hover:bg-[var(--muted)] transition-colors cursor-pointer"
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-lg">{hashtag.emoji}</span>
-                                            <span className="text-sm font-semibold text-[var(--foreground)]">#{hashtag.tag}</span>
-                                        </div>
-                                        <span className="text-xs text-[var(--foreground-muted)]">{(hashtag.count / 1000).toFixed(1)}K</span>
-                                    </a>
-                                ))}
+                            <TrendingSection />
+                        </div>
+
+                        {/* Top Creators */}
+                        <div
+                            className="overflow-hidden"
+                            style={{
+                                borderRadius: "var(--radius-xl)",
+                                border: "1px solid var(--border)",
+                                background: "var(--background-elevated)"
+                            }}
+                        >
+                            <div
+                                className="border-b border-[var(--border)]"
+                                style={{ padding: "var(--space-sm)" }}
+                            >
+                                <h3 className="font-bold text-[var(--foreground)]">Top Creators</h3>
+                            </div>
+                            <div style={{ paddingInline: "var(--space-sm)" }}>
+                                <TopCreators />
                             </div>
                         </div>
 
