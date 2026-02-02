@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { FeedContainer } from "@/components/feed/FeedContainer";
 import { TagFilter } from "@/components/discovery/TagFilter";
 import { cn } from "@/lib/utils";
@@ -21,7 +22,7 @@ const feedTabs = [
   { id: "tech", label: "💻 Tech", isActive: false },
 ];
 
-export default function HomePage() {
+function HomeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const activeTab = searchParams.get("sort") || "all";
@@ -59,5 +60,17 @@ export default function HomePage() {
         <FeedContainer sortBy={activeTab === 'trending' ? 'trending' : 'latest'} />
       </Stack>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="animate-spin text-[var(--accent-primary)]">⏳</div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }

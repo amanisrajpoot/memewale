@@ -118,7 +118,7 @@ export function TopNav({ onMenuClick, onSearchClick }: TopNavProps) {
                     {/* User menu / Login button */}
                     {isAuthenticated && user ? (
                         <div className="hidden sm:flex items-center gap-3">
-                            <span className="text-sm font-medium">{user.name}</span>
+                            <span className="text-sm font-medium">{user.user_metadata?.full_name || user.email}</span>
                             <Button
                                 variant="secondary"
                                 size="sm"
@@ -149,7 +149,7 @@ export function TopNav({ onMenuClick, onSearchClick }: TopNavProps) {
                     >
                         {isAuthenticated ? (
                             <img
-                                src={user?.avatar || "https://i.pravatar.cc/32"}
+                                src={user?.user_metadata?.avatar_url || "https://i.pravatar.cc/32"}
                                 alt="User"
                                 className="w-6 h-6 rounded-full"
                             />
