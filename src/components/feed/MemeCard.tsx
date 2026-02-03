@@ -191,13 +191,13 @@ export function MemeCard({ meme, priority = false, className }: MemeCardProps) {
             </div>
 
             {/* Media */}
-            <div className="meme-card-media">
+            <div className="relative w-full bg-[var(--background-elevated)] overflow-hidden">
                 <Link href={`/meme/${meme.id}`} className="block cursor-pointer">
                     <MediaRenderer
                         src={meme.mediaUrl}
                         alt={meme.caption}
                         type={meme.mediaType}
-                        className="max-h-[600px] w-full object-contain bg-black/5"
+                        className="w-full object-contain bg-black/5"
                         priority={priority}
                         onDoubleClick={handleDoubleTap}
                     />

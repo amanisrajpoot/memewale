@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { Upload, X, Image as ImageIcon } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/hooks/useToast";
 
 interface UploadFormProps {
@@ -12,8 +12,18 @@ interface UploadFormProps {
 export function UploadForm({ onFileSelect }: UploadFormProps) {
     const [dragActive, setDragActive] = useState(false);
     const [preview, setPreview] = useState<string | null>(null);
+    const [previewType, setPreviewType] = useState<"image" | "video">("image");
     const inputRef = useRef<HTMLInputElement>(null);
     const { addToast } = useToast();
+
+    // Cleanup object URL on unmount or change
+    useEffect(() => {
+        return () => {
+            if (preview) {
+                URL.revokeObjectURL(preview);
+            }
+        };
+    }, [preview]);
 
     const handleDrag = (e: React.DragEvent) => {
         e.preventDefault();
@@ -43,16 +53,15 @@ export function UploadForm({ onFileSelect }: UploadFormProps) {
 
     const handleFile = (file: File) => {
         // Basic validation
-        // Basic validation
-        if (!file.type.startsWith("image/")) {
-            addToast("Please upload an image file", "error");
+        if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) {
+            addToast("Please upload an image or video file", "error");
             return;
         }
 
-        // File size validation (5MB max)
-        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        // File size validation (50MB max)
+        const maxSize = 50 * 1024 * 1024; // 50MB
         if (file.size > maxSize) {
-            addToast("File too large! Maximum size is 5MB", "error");
+            addToast("File too large! Maximum size is 50MB", "error");
             return;
         }
 
@@ -60,11 +69,9 @@ export function UploadForm({ onFileSelect }: UploadFormProps) {
             onFileSelect(file);
         }
 
-        const reader = new FileReader();
-        reader.onload = () => {
-            setPreview(reader.result as string);
-        };
-        reader.readAsDataURL(file);
+        setPreviewType(file.type.startsWith("video/") ? "video" : "image");
+        const objectUrl = URL.createObjectURL(file);
+        setPreview(objectUrl);
     };
 
     const removeFile = () => {
@@ -78,15 +85,23 @@ export function UploadForm({ onFileSelect }: UploadFormProps) {
         <div className="w-full">
             {preview ? (
                 <div className="relative rounded-xl overflow-hidden bg-[var(--background-elevated)] border border-[var(--border)] group">
-                    <img
-                        src={preview}
-                        alt="Upload preview"
-                        className="w-full h-[300px] object-contain bg-[var(--background-base)]"
-                    />
+                    {previewType === 'video' ? (
+                        <video
+                            src={preview}
+                            controls
+                            className="w-full h-[300px] object-contain bg-black"
+                        />
+                    ) : (
+                        <img
+                            src={preview}
+                            alt="Upload preview"
+                            className="w-full h-[300px] object-contain bg-[var(--background-base)]"
+                        />
+                    )}
                     <button
                         type="button"
                         onClick={removeFile}
-                        className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors z-10"
                     >
                         <X size={20} />
                     </button>
@@ -109,7 +124,7 @@ export function UploadForm({ onFileSelect }: UploadFormProps) {
                         ref={inputRef}
                         type="file"
                         className="hidden"
-                        accept="image/*"
+                        accept="image/*,video/*"
                         onChange={handleChange}
                     />
                     <div className="flex flex-col items-center gap-3 text-[var(--foreground-muted)]">
@@ -121,7 +136,7 @@ export function UploadForm({ onFileSelect }: UploadFormProps) {
                                 Click to upload or drag and drop
                             </p>
                             <p className="text-xs mt-1">
-                                SVG, PNG, JPG or GIF (max. 5MB)
+                                Images, GIFs, Videos (MP4, MOV) • Max 50MB
                             </p>
                         </div>
                     </div>

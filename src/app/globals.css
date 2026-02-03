@@ -553,7 +553,6 @@ body {
   overflow: hidden;
   background: var(--background-elevated);
   /* No horizontal padding - media should be full width */
-  aspect-ratio: 1 / 1;
 }
 
 .meme-card-actions {

@@ -31,17 +31,17 @@ export function MediaRenderer({
 }: MediaRendererProps) {
     const [isLoaded, setIsLoaded] = useState(false);
     const [hasError, setHasError] = useState(false);
+    const [ratio, setRatio] = useState<number | undefined>(undefined);
 
     if (type === "video") {
         return (
             <div
                 className={cn("relative w-full bg-[var(--muted)]", className)}
-                style={{ aspectRatio }}
                 onDoubleClick={onDoubleClick}
             >
                 <video
                     src={src}
-                    className="w-full h-full object-cover"
+                    className="w-full h-auto block"
                     controls
                     playsInline
                     preload="metadata"
@@ -56,7 +56,7 @@ export function MediaRenderer({
                 "relative w-full overflow-hidden bg-[var(--muted)]",
                 className
             )}
-            style={{ aspectRatio }}
+            style={{ aspectRatio: ratio || aspectRatio }}
             onDoubleClick={onDoubleClick}
         >
             {/* Loading skeleton */}
@@ -80,11 +80,17 @@ export function MediaRenderer({
                 fill
                 priority={priority}
                 className={cn(
-                    "object-cover transition-opacity duration-300",
+                    "object-contain transition-opacity duration-300",
                     isLoaded ? "opacity-100" : "opacity-0"
                 )}
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 512px"
-                onLoad={() => setIsLoaded(true)}
+                onLoad={(e) => {
+                    setIsLoaded(true);
+                    const img = e.currentTarget;
+                    if (img.naturalWidth && img.naturalHeight) {
+                        setRatio(img.naturalWidth / img.naturalHeight);
+                    }
+                }}
                 onError={() => setHasError(true)}
                 unoptimized={type === "gif"}
             />

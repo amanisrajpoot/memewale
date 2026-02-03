@@ -59,12 +59,21 @@ export default function SubmitPage() {
                 .from('memes')
                 .getPublicUrl(fileName);
 
+            // Determine Media Type
+            let mediaType = "image";
+            if (file.type.startsWith("video/")) {
+                mediaType = "video";
+            } else if (file.type === "image/gif") {
+                mediaType = "gif";
+            }
+
             // 3. Insert into Memes table
             const { error: dbError } = await supabase
                 .from('memes')
                 .insert({
                     author_id: user.id,
                     media_url: publicUrl,
+                    media_type: mediaType,
                     caption: caption,
                     metadata: { width: 0, height: 0 }
                 });
@@ -168,8 +177,8 @@ export default function SubmitPage() {
                                         }
                                     }}
                                     className="absolute bottom-3 right-3 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] hover:bg-[var(--accent-primary)] hover:text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed group-focus-within:opacity-100 opacity-80 backdrop-blur-md border border-[var(--accent-primary)]/20"
-                                    disabled={isUploading || !file}
-                                    title="Auto-generate caption"
+                                    disabled={isUploading || !file || file.type.startsWith('video/')}
+                                    title={file?.type.startsWith('video/') ? "AI captions available for images only" : "Auto-generate caption"}
                                 >
                                     {isUploading ? (
                                         <span className="animate-spin">⏳</span>
