@@ -98,10 +98,10 @@ export function SideRail() {
             <div
                 className="flex-1 overflow-y-auto no-scrollbar"
                 style={{
-                    paddingTop: "var(--space-lg)",
+                    paddingTop: "var(--space-md)",
                 }}
             >
-                <Stack space="xl">
+                <Stack space="lg">
                     {/* Main navigation */}
                     <nav>
                         <Stack space="xs">
@@ -122,13 +122,13 @@ export function SideRail() {
                                             )}
                                             style={{
                                                 paddingInline: "var(--space-md)",
-                                                paddingBlock: "var(--space-sm)",
-                                                fontSize: "0.9375rem",
+                                                paddingBlock: "var(--space-xs)",
+                                                fontSize: "1rem",
                                                 width: "100%",
                                                 textAlign: "left"
                                             }}
                                         >
-                                            <Icon size={20} />
+                                            <Icon size={24} />
                                             {item.label}
                                         </button>
                                     );
@@ -139,20 +139,23 @@ export function SideRail() {
                                         key={item.href}
                                         href={item.href}
                                         className={cn(
-                                            "flex items-center gap-4 rounded-xl font-medium transition-all",
+                                            "flex items-center gap-4 rounded-xl font-medium transition-all relative group overflow-hidden",
                                             isActive
-                                                ? "bg-[var(--accent-primary)] text-[var(--background)] font-semibold shadow-sm"
+                                                ? "bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] font-bold"
                                                 : "text-[var(--foreground-muted)] hover:bg-[var(--muted)] hover:text-[var(--foreground)]"
                                         )}
                                         style={{
                                             paddingInline: "var(--space-md)",
-                                            paddingBlock: "var(--space-sm)",
-                                            fontSize: "0.9375rem", // 15px
+                                            paddingBlock: "var(--space-xs)",
+                                            fontSize: "1rem",
                                             transition: "all var(--transition-fast)"
                                         }}
                                         aria-current={isActive ? "page" : undefined}
                                     >
-                                        <Icon size={20} />
+                                        {isActive && (
+                                            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-[var(--accent-primary)] rounded-r-full shadow-[0_0_8px_var(--accent-primary)]" />
+                                        )}
+                                        <Icon size={24} className={isActive ? "text-[var(--accent-primary)]" : ""} />
                                         {item.label}
                                     </Link>
                                 );

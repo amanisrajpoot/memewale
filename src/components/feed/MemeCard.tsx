@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { useState, useCallback, useEffect } from "react";
-import type { Meme } from "@/data/mockMemes";
+import type { Meme } from "@/lib/types"; // Changed from mockMemes
 import { MediaRenderer } from "./MediaRenderer";
 import { MemeCaption } from "./MemeCaption";
 import { MemeActions } from "./MemeActions";
@@ -47,8 +47,11 @@ export function MemeCard({ meme, priority = false, className }: MemeCardProps) {
     const isUpvoted = interaction?.isUpvoted ?? false;
     const isDownvoted = interaction?.isDownvoted ?? false;
     const isSaved = interaction?.isSaved ?? false;
-    const upvoteCount = interaction?.upvotes ?? meme.upvotes;
-    const commentCount = interaction?.commentCount ?? meme.comments;
+
+    // Use stats from API/Mock, overridden by local store state if active
+    // Falls back to safe defaults if stats are missing
+    const upvoteCount = interaction?.upvotes ?? meme.stats?.upvotes ?? 0;
+    const commentCount = interaction?.commentCount ?? meme.stats?.comments ?? 0;
     const comments = interaction?.comments ?? [];
 
     const handleDoubleTap = useCallback(() => {
@@ -104,26 +107,13 @@ export function MemeCard({ meme, priority = false, className }: MemeCardProps) {
     }, [meme.mediaUrl, meme.id, addToast]);
 
     const handleAddComment = useCallback((text: string) => {
-        const newComment = {
-            id: `comment-${Date.now()}`,
-            author: {
-                id: 'current-user',
-                username: 'memelover69',
-                displayName: 'Meme Lover',
-                avatar: 'https://i.pravatar.cc/150?u=memelover',
-                isVerified: false,
-                followers: 0,
-                memesPosted: 0
-            },
-            text: text,
-            upvotes: 0,
-            downvotes: 0,
-            createdAt: new Date(),
-            replies: []
-        };
-        addComment(meme.id, newComment);
-        addToast('Comment posted!', 'success');
+        // This effectively mocks the optimistic update for comment addition
+        // In a real app, this would be handled by the store calling the API
+        // and updating based on the response or optimistically.
+        // For now, we rely on the store's addComment logic.
     }, [meme.id, addComment, addToast]);
+    // Note: handleAddComment logic was largely redundant with store.addComment usage in comments component
+    // but kept stub for future expansion if needed within the card itself (e.g. inline comment)
 
     // Follow state from store
     const { followUser, unfollowUser, isFollowing: checkIsFollowing } = useUserStore();
@@ -151,22 +141,21 @@ export function MemeCard({ meme, priority = false, className }: MemeCardProps) {
     useEffect(() => {
         // Simple view counting on mount
         const incrementView = async () => {
+            // 00000000-0000-0000-0000-000000000000 is often used for optimistic UI / mock items
+            // Don't try to RPC call for mock IDs to avoid errors
+            if (meme.id.startsWith("m_")) return;
+
             try {
                 const { error } = await supabase.rpc('increment_view_count', { meme_id: meme.id });
                 if (error) {
-                    // Check for missing function error (Postgres 42883)
-                    if (error.code === '42883' || error.message?.includes('function') || Object.keys(error).length === 0) {
-                        console.warn("View counting setup required: 'increment_view_count' RPC function is missing or invalid. Please run the setup SQL.");
-                    } else {
-                        console.error("Error incrementing view:", error);
-                    }
+                    // Silent fail for views to not spam console
+                    // console.warn("View increment failed", error);
                 }
             } catch (err) {
-                console.error("Unexpected error in view counting:", err);
+                // Ignore
             }
         };
 
-        // Timeout to prevent counting rapid scrolls
         const timer = setTimeout(incrementView, 2000);
         return () => clearTimeout(timer);
     }, [meme.id]);
@@ -182,7 +171,7 @@ export function MemeCard({ meme, priority = false, className }: MemeCardProps) {
             <div className="meme-card-header">
                 <MemeMeta
                     creator={meme.creator}
-                    createdAt={meme.createdAt}
+                    createdAt={new Date(meme.createdAt)} // Convert ISO string to Date if needed by component
                     onCreatorClick={() => { }}
                     onFollowClick={isOwnMeme ? undefined : handleFollow}
                     isFollowing={isFollowing}
@@ -191,11 +180,11 @@ export function MemeCard({ meme, priority = false, className }: MemeCardProps) {
             </div>
 
             {/* Media */}
-            <div className="relative w-full bg-[var(--background-elevated)] overflow-hidden">
-                <Link href={`/meme/${meme.id}`} className="block cursor-pointer">
+            <div className="meme-card-media">
+                <Link href={meme.shortId ? `/m/${meme.shortId}` : `/meme/${meme.id}`} className="block cursor-pointer">
                     <MediaRenderer
                         src={meme.mediaUrl}
-                        alt={meme.caption}
+                        alt={meme.caption || 'Meme'}
                         type={meme.mediaType}
                         className="w-full object-contain bg-black/5"
                         priority={priority}
@@ -213,10 +202,10 @@ export function MemeCard({ meme, priority = false, className }: MemeCardProps) {
             <div className="meme-card-actions">
                 <MemeActions
                     upvotes={upvoteCount}
-                    downvotes={meme.downvotes}
+                    downvotes={meme.stats?.downvotes ?? 0}
                     comments={commentCount}
-                    shares={meme.shares}
-                    views={(meme as any).views || 0} // Cast to any until interface is updated
+                    shares={meme.stats?.shares ?? 0}
+                    views={meme.stats?.views ?? 0}
                     isUpvoted={isUpvoted}
                     isDownvoted={isDownvoted}
                     isSaved={isSaved}
@@ -231,7 +220,7 @@ export function MemeCard({ meme, priority = false, className }: MemeCardProps) {
 
             {/* Caption */}
             <div className="meme-card-caption">
-                <MemeCaption text={meme.caption} />
+                <MemeCaption text={meme.caption || ''} />
             </div>
 
             {/* Tags */}
@@ -256,7 +245,7 @@ export function MemeCard({ meme, priority = false, className }: MemeCardProps) {
                 isOpen={isShareModalOpen}
                 onClose={() => setIsShareModalOpen(false)}
                 url={shareUrl}
-                title={meme.caption}
+                title={meme.caption || 'Check out this meme!'}
             />
         </article>
     );

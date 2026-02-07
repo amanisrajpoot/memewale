@@ -43,8 +43,10 @@ export type MediaType = "image" | "gif" | "video";
 
 export interface Meme {
     id: string;
+    shortId?: string; // 8-character short ID for clean URLs (e.g., "dQw4w9Wg")
     mediaUrl: string;
     mediaType: MediaType;
+    aspectRatio?: number; // width/height
     caption: string | null;
     tags: string[];
     creator: User;

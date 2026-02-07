@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Drawer } from "@/components/ui/Drawer";
 import { CommentThread } from "./CommentThread";
 import { CommentInput } from "./CommentInput";
-import type { Comment } from "@/data/mockComments";
+import type { Comment } from "@/lib/types";
 import { X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";

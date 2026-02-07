@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/useToast";
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
+import { generateShortId } from "@/lib/shortId";
 
 export default function SubmitPage() {
     const [caption, setCaption] = useState("");
@@ -72,6 +73,7 @@ export default function SubmitPage() {
                 .from('memes')
                 .insert({
                     author_id: user.id,
+                    short_id: generateShortId(),
                     media_url: publicUrl,
                     media_type: mediaType,
                     caption: caption,
@@ -92,39 +94,47 @@ export default function SubmitPage() {
     };
 
     return (
-        <div className="feed-container" style={{ paddingLeft: '1rem', paddingRight: '1rem', paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
-            <div className="mx-auto space-y-8">
+        <div className="feed-container pt-10">
+            <div className="max-w-2xl mx-auto space-y-10">
 
                 {/* Header */}
-                <div className="text-center space-y-2">
+                <div className="text-center space-y-3">
                     <h1 className="text-4xl font-extrabold tracking-tight text-[var(--foreground)]">
-                        Upload to Memewale
+                        Share a Meme
                     </h1>
-                    <p className="text-lg text-[var(--foreground-muted)] max-w-lg mx-auto">
-                        Share the laughter. Post your best memes and join the conversation.
+                    <p className="text-[var(--foreground-muted)] max-w-sm mx-auto">
+                        Post your best memes and join the community.
                     </p>
                 </div>
 
                 {/* Form Card */}
-                <div className="bg-[var(--background-elevated)] border border-[var(--border)] rounded-2xl p-6 sm:p-8 shadow-xl">
-                    <form onSubmit={handleSubmit} className="space-y-8">
+                <div className="bg-[var(--background-elevated)] border border-[var(--border)] rounded-2xl p-6 sm:p-7 shadow-lg">
+                    <form onSubmit={handleSubmit} className="space-y-6">
 
                         {/* Upload Section */}
-                        <div className="space-y-3">
-                            <label className="text-xs font-bold uppercase tracking-widest text-[var(--foreground-muted)] block pl-1">
-                                1. Upload Media
+                        <div className="space-y-4">
+                            <label className="text-sm font-semibold text-[var(--foreground)] flex items-center gap-2 pl-1">
+                                <span className="p-1.5 rounded-lg bg-[var(--accent-primary)]/10 text-[var(--accent-primary)]">
+                                    <Wand2 size={14} />
+                                </span>
+                                Choose Meme Content
                             </label>
-                            <div className="bg-[var(--background)] rounded-xl border border-[var(--border)] p-1">
+                            <div className="bg-[var(--background)] rounded-2xl border border-[var(--border)] p-1 hover:border-[var(--accent-primary)]/30 transition-colors">
                                 <UploadForm onFileSelect={setFile} />
                             </div>
                         </div>
 
                         {/* Caption Section */}
-                        <div className="space-y-3">
-                            <label className="text-xs font-bold uppercase tracking-widest text-[var(--foreground-muted)] block flex justify-between items-center pl-1">
-                                <span>2. Add a Caption</span>
-                                <span className="text-[10px] bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] px-2 py-0.5 rounded-full border border-[var(--accent-primary)]/20">
-                                    AI Powered
+                        <div className="space-y-4">
+                            <label className="text-sm font-semibold text-[var(--foreground)] flex justify-between items-center pl-1">
+                                <div className="flex items-center gap-2">
+                                    <span className="p-1.5 rounded-lg bg-[var(--accent-secondary)]/10 text-[var(--accent-secondary)]">
+                                        <Wand2 size={14} />
+                                    </span>
+                                    Add a Caption
+                                </div>
+                                <span className="text-[10px] font-bold uppercase tracking-wider bg-[var(--accent-primary)]/10 text-[var(--accent-primary)] px-2.5 py-1 rounded-full border border-[var(--accent-primary)]/20">
+                                    AI Magic
                                 </span>
                             </label>
 

@@ -36,6 +36,15 @@ create table if not exists memes (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Add short_id column for URL shortening (e.g., /m/dQw4w9Wg)
+do $$
+begin
+  if not exists (select 1 from information_schema.columns where table_name = 'memes' and column_name = 'short_id') then
+    alter table memes add column short_id varchar(12) unique;
+    create index idx_memes_short_id on memes(short_id);
+  end if;
+end $$;
+
 -- INTERACTIONS TABLE (Likes, Downvotes, Saves)
 create table if not exists interactions (
   id uuid default uuid_generate_v4() primary key,
@@ -106,15 +115,45 @@ end $$;
 -- AUTOMATIC PROFILE CREATION TRIGGER
 create or replace function public.handle_new_user()
 returns trigger as $$
+declare
+  candidate_username text;
+  final_username text;
+  counter integer := 0;
 begin
+  -- 1. Try to get a starting name from metadata or email
+  candidate_username := coalesce(
+    new.raw_user_meta_data->>'username',
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'name',
+    split_part(new.email, '@', 1)
+  );
+
+  -- 2. Clean it: lowercase, alphanumeric + underscores only
+  candidate_username := lower(regexp_replace(candidate_username, '[^a-zA-Z0-9_]', '', 'g'));
+  
+  -- 3. Fallback if result is empty
+  if candidate_username = '' or candidate_username is null then
+    candidate_username := 'memer_' || substr(new.id::text, 1, 5);
+  end if;
+
+  final_username := candidate_username;
+
+  -- 4. Loop to ensure uniqueness
+  while exists (select 1 from public.profiles where username = final_username) loop
+    counter := counter + 1;
+    final_username := candidate_username || counter::text;
+  end loop;
+
+  -- 5. Insert with final unique username
   insert into public.profiles (id, username, full_name, avatar_url)
   values (
     new.id, 
-    new.raw_user_meta_data->>'username', 
-    new.raw_user_meta_data->>'full_name', 
-    new.raw_user_meta_data->>'avatar_url'
+    final_username,
+    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'),
+    coalesce(new.raw_user_meta_data->>'avatar_url', new.raw_user_meta_data->>'picture')
   )
   on conflict (id) do nothing;
+
   return new;
 end;
 $$ language plpgsql security definer;

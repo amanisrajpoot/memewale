@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createClient } from '@/lib/supabase/client';
-import { type Meme } from '@/data/mockMemes';
-import type { Comment } from '@/data/mockComments';
+import type { Meme } from '@/lib/types';
+import type { Comment } from '@/lib/types'; // Unified types
 
 const supabase = createClient();
 
@@ -37,13 +37,13 @@ export const useMemeStore = create<MemeStore>((set, get) => ({
                     ...interactions,
                     [meme.id]: {
                         memeId: meme.id,
-                        isUpvoted: meme.isUpvoted || false,
-                        isDownvoted: meme.isDownvoted || false,
-                        isSaved: meme.isSaved || false,
-                        upvotes: meme.upvotes || 0,
-                        downvotes: meme.downvotes || 0,
+                        isUpvoted: meme.userInteraction?.hasUpvoted || false,
+                        isDownvoted: meme.userInteraction?.hasDownvoted || false,
+                        isSaved: meme.userInteraction?.hasSaved || false,
+                        upvotes: meme.stats?.upvotes || 0,
+                        downvotes: meme.stats?.downvotes || 0,
                         comments: comments,
-                        commentCount: meme.comments || 0
+                        commentCount: meme.stats?.comments || 0
                     }
                 }
             });

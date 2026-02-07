@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { formatCount } from "@/data/mockMemes";
+import { formatCount } from "@/lib/utils";
 import {
     ArrowBigUp,
     ArrowBigDown,
@@ -59,9 +59,9 @@ export function MemeActions({
         >
             {/* View Count (Left aligned, subtle) */}
             {views > 0 && (
-                <div className="flex items-center gap-1.5 mr-auto px-2 py-2 text-[var(--foreground-muted)]">
-                    <Eye className="w-4 h-4" />
-                    <span className="text-xs font-medium">{formatCount(views)}</span>
+                <div className="flex items-center gap-1.5 mr-auto px-1 py-1 text-[var(--foreground-muted)]">
+                    <Eye className="w-3.5 h-3.5" />
+                    <span className="text-[10px] font-bold uppercase tracking-wider">{formatCount(views)}</span>
                 </div>
             )}
 
@@ -73,11 +73,10 @@ export function MemeActions({
 
             {/* Upvote/Downvote group */}
             <div className="flex items-center rounded-full bg-[var(--muted)]">
-                {/* ... existing buttons ... */}
                 <button
                     onClick={onUpvote}
                     className={cn(
-                        "flex items-center gap-1 px-3 py-2 rounded-l-full transition-all",
+                        "flex items-center gap-1 px-3 py-1.5 rounded-l-full transition-all",
                         "hover:bg-[var(--muted-hover)]",
                         isUpvoted && "bg-[var(--upvote)]/20 text-[var(--upvote)]"
                     )}
@@ -86,13 +85,13 @@ export function MemeActions({
                     <ArrowBigUp
                         className={cn("w-5 h-5 transition-all", isUpvoted && "fill-current scale-110")}
                     />
-                    <span className={cn("text-sm font-medium", isUpvoted && "font-bold")}>{formatCount(netVotes)}</span>
+                    <span className={cn("text-xs font-bold", isUpvoted && "text-[var(--upvote)]")}>{formatCount(netVotes)}</span>
                 </button>
-                <div className="w-px h-5 bg-[var(--border)]" />
+                <div className="w-px h-4 bg-[var(--border)]" />
                 <button
                     onClick={onDownvote}
                     className={cn(
-                        "flex items-center px-3 py-2 rounded-r-full transition-all",
+                        "flex items-center px-3 py-1.5 rounded-r-full transition-all",
                         "hover:bg-[var(--muted-hover)]",
                         isDownvoted && "bg-[var(--downvote)]/20 text-[var(--downvote)]"
                     )}
@@ -108,25 +107,25 @@ export function MemeActions({
             <button
                 onClick={onComment}
                 className={cn(
-                    "flex items-center gap-1.5 px-3 py-2 rounded-full transition-colors",
+                    "flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-colors",
                     "bg-[var(--muted)] hover:bg-[var(--muted-hover)]"
                 )}
                 aria-label="Comments"
             >
                 <MessageCircle className="w-5 h-5" />
-                <span className="text-sm font-medium">{formatCount(comments)}</span>
+                <span className="text-xs font-bold">{formatCount(comments)}</span>
             </button>
 
             {/* Share button */}
             <button
                 onClick={onShare}
                 className={cn(
-                    "flex items-center gap-1.5 px-3 py-2 rounded-full transition-colors",
+                    "flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-colors",
                     "bg-[var(--muted)] hover:bg-[var(--muted-hover)]"
                 )}
                 aria-label="Share"
             >
-                <Share2 className="w-5 h-5" />
+                <Share2 className="w-4.5 h-4.5" />
             </button>
 
 
@@ -134,25 +133,25 @@ export function MemeActions({
             <button
                 onClick={onSave}
                 className={cn(
-                    "p-2 rounded-full transition-all",
+                    "p-1.5 rounded-full transition-all",
                     "hover:bg-[var(--muted)]",
                     isSaved && "bg-[var(--save)]/20 text-[var(--save)]"
                 )}
                 aria-label={isSaved ? "Unsave" : "Save"}
             >
-                <Bookmark className={cn("w-5 h-5 transition-all", isSaved && "fill-current scale-110")} />
+                <Bookmark className={cn("w-4.5 h-4.5 transition-all", isSaved && "fill-current scale-110")} />
             </button>
 
             {/* Download button */}
             <button
                 onClick={onDownload}
                 className={cn(
-                    "p-2 rounded-full transition-colors",
+                    "p-1.5 rounded-full transition-colors",
                     "hover:bg-[var(--muted)]"
                 )}
                 aria-label="Download"
             >
-                <Download className="w-5 h-5" />
+                <Download className="w-4.5 h-4.5" />
             </button>
         </div>
     );

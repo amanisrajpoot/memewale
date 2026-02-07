@@ -60,9 +60,6 @@ export default function NotificationsPage() {
 
                 if (error) throw error;
 
-                // Supabase returns 'actor' as an array or object depending on relationship. 
-                // Since it's a foreign key, it returns an object if 1:1 or N:1. 
-                // We cast it to match our interface.
                 setNotifications(data as any[] || []);
             } catch (error) {
                 console.error("Error fetching notifications:", error);
@@ -120,7 +117,7 @@ export default function NotificationsPage() {
     }
 
     return (
-        <div style={{ paddingLeft: '1rem', paddingRight: '1rem', paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
+        <div className="feed-container">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
                 <h1 className="text-2xl font-bold text-[var(--foreground)]">Notifications</h1>
                 <button
@@ -187,7 +184,7 @@ export default function NotificationsPage() {
 
                             {/* Target Preview (Meme Image) */}
                             {notification.entity_id && notification.data?.preview_url && (
-                                <Link href={`/meme/${notification.entity_id}`} className="shrink-0">
+                                <Link href={notification.data?.short_id ? `/m/${notification.data.short_id}` : `/meme/${notification.entity_id}`} className="shrink-0">
                                     <Image
                                         src={notification.data.preview_url}
                                         alt="Meme preview"

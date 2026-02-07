@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/Button";
 
 interface Collection {
     id: string;
@@ -62,6 +63,7 @@ export default function CollectionsPage() {
                     .select(`
                         meme:meme_id (
                             id,
+                            short_id,
                             author_id,
                             caption,
                             media_url,
@@ -91,6 +93,7 @@ export default function CollectionsPage() {
                     if (!m) return null;
                     return {
                         id: m.id,
+                        shortId: m.short_id,
                         caption: m.caption,
                         mediaUrl: m.media_url,
                         mediaType: m.media_type,
@@ -131,68 +134,81 @@ export default function CollectionsPage() {
     }
 
     return (
-        <div className="feed-container" style={{ paddingLeft: '1rem', paddingRight: '1rem', paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
-            <div className="flex items-center justify-between mb-6">
-                <h1 className="text-2xl font-bold text-[var(--foreground)]">Collections</h1>
-                <button
-                    className="flex items-center gap-2 text-sm font-semibold text-[var(--accent-primary)] hover:opacity-80 transition-opacity"
-                    onClick={() => {/* Open Create Collection Modal */ }}
-                >
-                    <Plus size={18} />
-                    New Collection
-                </button>
-            </div>
+        <div className="feed-container pt-10">
+            <div className="max-w-4xl mx-auto">
+                <div className="flex items-center justify-between mb-8">
+                    <div>
+                        <h1 className="text-3xl font-extrabold tracking-tight">Collections</h1>
+                        <p className="text-[var(--foreground-muted)]">Organize your favorite memes</p>
+                    </div>
+                    <button
+                        className="flex items-center gap-2 text-sm font-semibold text-[var(--accent-primary)] hover:opacity-80 transition-opacity"
+                        onClick={() => {/* Open Create Collection Modal */ }}
+                    >
+                        <Plus size={18} />
+                        New Collection
+                    </button>
+                </div>
 
-            {/* Grid of Collections */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10">
-                {collections.length > 0 ? (
-                    collections.map((col) => (
-                        <div key={col.id} className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer bg-[var(--background-elevated)] border border-[var(--border)]">
-                            {col.cover_image ? (
-                                <img
-                                    src={col.cover_image}
-                                    alt={col.name}
-                                    className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center bg-[var(--muted)] text-[var(--foreground-muted)]">
-                                    <FolderHeart size={32} />
+                {/* Grid of Collections */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10">
+                    {collections.length > 0 ? (
+                        collections.map((col) => (
+                            <div key={col.id} className="group relative aspect-square rounded-xl overflow-hidden cursor-pointer bg-[var(--background-elevated)] border border-[var(--border)]">
+                                {col.cover_image ? (
+                                    <img
+                                        src={col.cover_image}
+                                        alt={col.name}
+                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-[var(--muted)] text-[var(--foreground-muted)]">
+                                        <FolderHeart size={32} />
+                                    </div>
+                                )}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-4 flex flex-col justify-end">
+                                    <h3 className="font-bold text-white text-lg leading-tight">{col.name}</h3>
+                                    {col.description && <p className="text-white/80 text-xs mt-1 line-clamp-1">{col.description}</p>}
                                 </div>
-                            )}
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-4 flex flex-col justify-end">
-                                <h3 className="font-bold text-white text-lg leading-tight">{col.name}</h3>
-                                {col.description && <p className="text-white/80 text-xs mt-1 line-clamp-1">{col.description}</p>}
                             </div>
+                        ))
+                    ) : (
+                        <div className="col-span-full py-8 text-center bg-[var(--background-elevated)] rounded-xl border border-dashed border-[var(--border)]">
+                            <p className="text-[var(--foreground-muted)]">You haven't created any collections yet.</p>
                         </div>
-                    ))
-                ) : (
-                    <div className="col-span-full py-8 text-center bg-[var(--background-elevated)] rounded-xl border border-dashed border-[var(--border)]">
-                        <p className="text-[var(--foreground-muted)]">You haven't created any collections yet.</p>
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
 
-            {/* Saved Memes Section */}
-            <div className="mb-6">
-                <h2 className="text-xl font-bold text-[var(--foreground)] flex items-center gap-2 mb-4">
-                    <FolderHeart className="text-[var(--accent-secondary)]" size={24} />
-                    Saved Memes
-                </h2>
-                {savedMemes.length > 0 ? (
-                    <div className="space-y-6">
-                        {savedMemes.map((meme) => (
-                            <div key={meme.id} className="border-b border-[var(--border)] pb-6 last:border-0 last:pb-0">
-                                <MemeCard meme={meme} />
+                {/* Saved Memes Section */}
+                <div className="mb-6">
+                    <h2 className="text-xl font-bold text-[var(--foreground)] flex items-center gap-2 mb-4">
+                        <FolderHeart className="text-[var(--accent-secondary)]" size={24} />
+                        Saved Memes
+                    </h2>
+                    {savedMemes.length > 0 ? (
+                        <div className="space-y-6">
+                            {savedMemes.map((meme) => (
+                                <div key={meme.id} className="border-b border-[var(--border)] pb-6 last:border-0 last:pb-0">
+                                    <MemeCard meme={meme} />
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-24 px-6 bg-[var(--background-elevated)] rounded-3xl border border-[var(--border)] border-dashed">
+                            <div className="w-20 h-20 bg-[var(--background)] rounded-full flex items-center justify-center mx-auto mb-6 border border-[var(--border)]">
+                                <FolderHeart className="w-10 h-10 text-[var(--foreground-muted)] opacity-50" />
                             </div>
-                        ))}
-                    </div>
-                ) : (
-                    <EmptyState
-                        icon={FolderHeart}
-                        title="No Saved Memes Yet"
-                        description="Start saving memes you love by clicking the bookmark icon!"
-                    />
-                )}
+                            <h3 className="text-xl font-bold mb-2">No Saved Memes Yet</h3>
+                            <p className="text-[var(--foreground-muted)] mb-8 max-w-xs mx-auto">Start saving memes you love by clicking the bookmark icon on any post!</p>
+                            <Button
+                                onClick={() => router.push("/")}
+                                className="bg-[var(--accent-primary)] text-[var(--background)] font-bold px-8 py-6 rounded-2xl shadow-lg hover:shadow-[var(--accent-primary)]/20 transition-all active:scale-95"
+                            >
+                                Discover Memes
+                            </Button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

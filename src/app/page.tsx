@@ -1,11 +1,12 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { FeedContainer } from "@/components/feed/FeedContainer";
 import { TagFilter } from "@/components/discovery/TagFilter";
 import { cn } from "@/lib/utils";
 import { Stack } from "@/components/layout";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAuthModalStore } from "@/store/useAuthModalStore";
 
 // =============================================================================
 // HOME PAGE
@@ -15,7 +16,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 // Initial tags (could be fetched from DB in future)
 const feedTabs = [
-  { id: "all", label: "All", isActive: true },
   { id: "trending", label: "🔥 Trending", isActive: false },
   { id: "desi", label: "🇮🇳 Desi", isActive: false },
   { id: "cricket", label: "🏏 Cricket", isActive: false },
@@ -27,12 +27,30 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const activeTab = searchParams.get("sort") || "all";
 
+  // Handle login redirect from auth middleware
+  const loginRequired = searchParams.get("login");
+  const redirectPath = searchParams.get("redirect");
+
+  // Auto-open login modal if redirected from protected route
+  useEffect(() => {
+    if (loginRequired === "required") {
+      const { openModal } = useAuthModalStore.getState();
+      openModal('login');
+
+      // Clean up URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete("login");
+      url.searchParams.delete("redirect");
+      router.replace(url.pathname + url.search, { scroll: false });
+    }
+  }, [loginRequired, router]);
+
   const handleTabChange = (id: string) => {
     router.push(`/?sort=${id}`);
   };
 
   return (
-    <div className="feed-container" style={{ paddingLeft: '1rem', paddingRight: '1rem', paddingTop: '1.5rem', paddingBottom: '1.5rem' }}>
+    <div className="feed-container">
       <Stack space="lg">
         {/* Page header */}
         <header>

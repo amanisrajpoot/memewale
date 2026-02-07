@@ -1,7 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { formatTimeAgo, formatCount, type Creator } from "@/data/mockMemes";
+import { formatTimeAgo } from "@/lib/utils";
+import type { User } from "@/lib/types";
 import { MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import Image from "next/image";
@@ -12,8 +13,8 @@ import Image from "next/image";
 // =============================================================================
 
 export interface MemeMetaProps {
-    creator: Creator;
-    createdAt: Date;
+    creator: User;
+    createdAt: Date | string; // Handle both Date obj and ISO string
     onCreatorClick?: () => void;
     onFollowClick?: () => void;
     onMoreClick?: () => void;
@@ -40,7 +41,7 @@ export function MemeMeta({
                     className="shrink-0 rounded-full ring-2 ring-[var(--border)] hover:ring-[var(--accent-primary)] transition-all overflow-hidden"
                 >
                     <Image
-                        src={creator.avatar}
+                        src={creator.avatarUrl || `https://ui-avatars.com/api/?name=${creator.username}&background=random`}
                         alt={creator.displayName}
                         width={44}
                         height={44}

@@ -10,16 +10,17 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/useToast";
 import { useAuthStore } from "@/store/useAuthStore";
+import { isValidShortId } from "@/lib/shortId";
 import type { Meme, Comment } from "@/lib/types";
 
-interface MemeDetailPageProps {
+interface MemeShortPageProps {
     params: Promise<{
-        id: string;
+        shortId: string;
     }>;
 }
 
-export default function MemeDetailPage({ params }: MemeDetailPageProps) {
-    const { id } = use(params);
+export default function MemeShortPage({ params }: MemeShortPageProps) {
+    const { shortId } = use(params);
     const [meme, setMeme] = useState<Meme | null>(null);
     const [comments, setComments] = useState<Comment[]>([]);
     const [relatedMemes, setRelatedMemes] = useState<Meme[]>([]);
@@ -32,9 +33,8 @@ export default function MemeDetailPage({ params }: MemeDetailPageProps) {
 
     useEffect(() => {
         const fetchMeme = async () => {
-            // Basic UUID validation to prevent 500s on invalid IDs
-            const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-            if (!uuidRegex.test(id)) {
+            // Validate short ID format
+            if (!isValidShortId(shortId)) {
                 setLoading(false);
                 return;
             }
@@ -45,21 +45,15 @@ export default function MemeDetailPage({ params }: MemeDetailPageProps) {
                     *,
                     author:profiles!memes_author_id_fkey(*)
                 `)
-                .eq('id', id)
+                .eq('short_id', shortId)
                 .single();
 
             if (error) {
                 console.error("Error fetching meme:", error);
             } else if (data) {
-                // If this meme has a short ID, redirect to the new cleaner URL
-                if (data.short_id) {
-                    redirect(`/m/${data.short_id}`);
-                }
-
-                // Map to Meme interface (for cases where redirect doesn't happen)
+                // Map to Meme interface
                 const mappedMeme: Meme = {
                     id: data.id,
-                    shortId: data.short_id,
                     caption: data.caption,
                     mediaUrl: data.media_url,
                     mediaType: data.media_type || "image",
@@ -92,21 +86,22 @@ export default function MemeDetailPage({ params }: MemeDetailPageProps) {
                     userInteraction: null,
                     createdAt: data.created_at,
                     tags: [],
+                    shortId: data.short_id,
                 };
                 setMeme(mappedMeme);
 
                 // Fetch related memes (same author or similar tags)
-                fetchRelatedMemes(data.author.id);
+                fetchRelatedMemes(data.author.id, data.id);
             }
             setLoading(false);
         };
 
-        const fetchRelatedMemes = async (authorId: string) => {
+        const fetchRelatedMemes = async (authorId: string, currentMemeId: string) => {
             const { data } = await supabase
                 .from('memes')
                 .select(`*, author:profiles!memes_author_id_fkey(*)`)
                 .eq('author_id', authorId)
-                .neq('id', id)
+                .neq('id', currentMemeId)
                 .limit(3);
 
             if (data) {
@@ -150,17 +145,18 @@ export default function MemeDetailPage({ params }: MemeDetailPageProps) {
         };
 
         fetchMeme();
-    }, [id, supabase]);
+    }, [shortId, supabase]);
 
-    // Define fetchComments outside so handleAddComment can use it
+    // Define fetchComments outside useEffect so handleAddComment can call it
     const fetchComments = async () => {
+        if (!meme) return;
         setCommentsLoading(true);
 
         // Fetch ALL comments for this meme to build a tree client-side
         const { data: allComments, error } = await supabase
             .from('comments')
             .select('*, author:profiles(*)')
-            .eq('meme_id', id)
+            .eq('meme_id', meme.id)
             .order('created_at', { ascending: true });
 
         if (error) {
@@ -215,6 +211,7 @@ export default function MemeDetailPage({ params }: MemeDetailPageProps) {
                         parent.replies.push(comment);
                         parent.replyCount++;
                     } else {
+                        console.warn(`[Comments Debug] Parent ${parentId} not found for ${commentId}`);
                         roots.push(comment);
                     }
                 } else {
@@ -222,7 +219,7 @@ export default function MemeDetailPage({ params }: MemeDetailPageProps) {
                 }
             });
 
-            // Sort roots by newest first
+            // Sort roots by newest first (Reddit/Twitter style)
             setComments(roots.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
         }
         setCommentsLoading(false);
@@ -230,9 +227,8 @@ export default function MemeDetailPage({ params }: MemeDetailPageProps) {
 
     // Fetch comments
     useEffect(() => {
-        if (!meme) return;
         fetchComments();
-    }, [meme, id, supabase]);
+    }, [meme, supabase]);
 
     const handleAddComment = async (text: string, parentId?: string) => {
         if (!user) {
@@ -240,9 +236,11 @@ export default function MemeDetailPage({ params }: MemeDetailPageProps) {
             return;
         }
 
+        if (!meme) return;
+
         const { error } = await supabase.from('comments').insert({
             content: text,
-            meme_id: id,
+            meme_id: meme.id,
             user_id: user.id,
             parent_id: parentId || null
         });

@@ -1,35 +1,117 @@
+import { User, Meme, MediaType } from "@/lib/types";
+
 // =============================================================================
-// MOCK DATA - INDIAN MEME ECOSYSTEM
-// Realistic data for development and testing.
+// MOCK CREATORS
 // =============================================================================
 
-export interface Creator {
-    id: string;
-    username: string;
-    displayName: string;
-    avatar: string;
-    isVerified: boolean;
-    followers: number;
-    memesPosted: number;
-}
+export const mockCreators: User[] = [
+    {
+        id: "cr_1",
+        username: "desi_memer",
+        displayName: "Desi Memer 🇮🇳",
+        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=desi_memer",
+        isVerified: true,
+        stats: {
+            followers: 125400,
+            memesPosted: 342,
+            following: 12,
+            totalUpvotes: 50000,
+            totalShares: 2000
+        },
+        bio: "Just a desi guy sharing memes",
+        createdAt: new Date().toISOString(),
+        badges: []
+    },
+    {
+        id: "cr_2",
+        username: "bollywood_tadka",
+        displayName: "Bollywood Tadka",
+        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=bollywood",
+        isVerified: true,
+        stats: {
+            followers: 89200,
+            memesPosted: 567,
+            following: 45,
+            totalUpvotes: 120000,
+            totalShares: 5000,
+        },
+        bio: "Bollywood masala everyday",
+        createdAt: new Date().toISOString(),
+        badges: []
+    },
+    {
+        id: "cr_3",
+        username: "cricket_pagal",
+        displayName: "Cricket Pagal 🏏",
+        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=cricket",
+        isVerified: false,
+        stats: {
+            followers: 45600,
+            memesPosted: 234,
+            following: 0,
+            totalUpvotes: 30000,
+            totalShares: 1000,
+        },
+        bio: "Cricket is religion",
+        createdAt: new Date().toISOString(),
+        badges: []
+    },
+    {
+        id: "cr_4",
+        username: "relatable_banda",
+        displayName: "Relatable Banda",
+        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=relatable",
+        isVerified: false,
+        stats: {
+            followers: 32100,
+            memesPosted: 189,
+            following: 10,
+            totalUpvotes: 15000,
+            totalShares: 500,
+        },
+        bio: "Relatable AF",
+        createdAt: new Date().toISOString(),
+        badges: []
+    },
+    {
+        id: "cr_5",
+        username: "dark_humor_india",
+        displayName: "Dark Humor India 💀",
+        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=dark",
+        isVerified: true,
+        stats: {
+            followers: 201000,
+            memesPosted: 456,
+            following: 666,
+            totalUpvotes: 66600,
+            totalShares: 6660,
+        },
+        bio: "Not for the faint hearted",
+        createdAt: new Date().toISOString(),
+        badges: []
+    },
+    {
+        id: "cr_6",
+        username: "chai_sutta_memes",
+        displayName: "Chai Sutta Memes ☕",
+        avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=chai",
+        isVerified: false,
+        stats: {
+            followers: 67800,
+            memesPosted: 312,
+            following: 420,
+            totalUpvotes: 42000,
+            totalShares: 4200,
+        },
+        bio: "Chai is love, Sutta is life",
+        createdAt: new Date().toISOString(),
+        badges: []
+    },
+];
 
-export interface Meme {
-    id: string;
-    mediaUrl: string;
-    mediaType: "image" | "gif" | "video";
-    aspectRatio: number; // width/height
-    caption: string;
-    tags: string[];
-    creator: Creator;
-    upvotes: number;
-    downvotes: number;
-    comments: number;
-    shares: number;
-    createdAt: Date;
-    isUpvoted?: boolean;
-    isDownvoted?: boolean;
-    isSaved?: boolean;
-}
+// =============================================================================
+// MOCK TAGS
+// =============================================================================
 
 export interface Tag {
     id: string;
@@ -38,71 +120,6 @@ export interface Tag {
     emoji: string;
     memeCount: number;
 }
-
-// =============================================================================
-// MOCK CREATORS
-// =============================================================================
-
-export const mockCreators: Creator[] = [
-    {
-        id: "cr_1",
-        username: "desi_memer",
-        displayName: "Desi Memer 🇮🇳",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=desi_memer",
-        isVerified: true,
-        followers: 125400,
-        memesPosted: 342,
-    },
-    {
-        id: "cr_2",
-        username: "bollywood_tadka",
-        displayName: "Bollywood Tadka",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=bollywood",
-        isVerified: true,
-        followers: 89200,
-        memesPosted: 567,
-    },
-    {
-        id: "cr_3",
-        username: "cricket_pagal",
-        displayName: "Cricket Pagal 🏏",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=cricket",
-        isVerified: false,
-        followers: 45600,
-        memesPosted: 234,
-    },
-    {
-        id: "cr_4",
-        username: "relatable_banda",
-        displayName: "Relatable Banda",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=relatable",
-        isVerified: false,
-        followers: 32100,
-        memesPosted: 189,
-    },
-    {
-        id: "cr_5",
-        username: "dark_humor_india",
-        displayName: "Dark Humor India 💀",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=dark",
-        isVerified: true,
-        followers: 201000,
-        memesPosted: 456,
-    },
-    {
-        id: "cr_6",
-        username: "chai_sutta_memes",
-        displayName: "Chai Sutta Memes ☕",
-        avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=chai",
-        isVerified: false,
-        followers: 67800,
-        memesPosted: 312,
-    },
-];
-
-// =============================================================================
-// MOCK TAGS
-// =============================================================================
 
 export const mockTags: Tag[] = [
     { id: "t1", name: "Desi", slug: "desi", emoji: "🇮🇳", memeCount: 12500 },
@@ -131,11 +148,17 @@ export const mockMemes: Meme[] = [
         caption: "When your mom says 'beta, bas 5 minute aur' and you know it's going to be 2 hours 😭 #desi #relatable",
         tags: ["desi", "relatable", "wholesome"],
         creator: mockCreators[0],
-        upvotes: 4523,
-        downvotes: 123,
-        comments: 234,
-        shares: 156,
-        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+        stats: {
+            upvotes: 4523,
+            downvotes: 123,
+            comments: 234,
+            shares: 156,
+            saves: 45,
+            views: 12000,
+            score: 0
+        },
+        userInteraction: null,
+        createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
     },
     {
         id: "m_2",
@@ -145,11 +168,17 @@ export const mockMemes: Meme[] = [
         caption: "Every Indian parent after you score 98% - 'Beta, wo 2% kahan gaye?' 📚 #bollywood #desi",
         tags: ["bollywood", "desi", "relatable"],
         creator: mockCreators[1],
-        upvotes: 8934,
-        downvotes: 234,
-        comments: 567,
-        shares: 890,
-        createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000), // 5 hours ago
+        stats: {
+            upvotes: 8934,
+            downvotes: 234,
+            comments: 567,
+            shares: 890,
+            saves: 120,
+            views: 25000,
+            score: 0
+        },
+        userInteraction: null,
+        createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
     },
     {
         id: "m_3",
@@ -159,11 +188,17 @@ export const mockMemes: Meme[] = [
         caption: "Kohli when he sees Cummins bowling short 🔥 #cricket #virat",
         tags: ["cricket", "desi"],
         creator: mockCreators[2],
-        upvotes: 12456,
-        downvotes: 456,
-        comments: 890,
-        shares: 1234,
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+        stats: {
+            upvotes: 12456,
+            downvotes: 456,
+            comments: 890,
+            shares: 1234,
+            saves: 300,
+            views: 50000,
+            score: 0
+        },
+        userInteraction: null,
+        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
     },
     {
         id: "m_4",
@@ -173,11 +208,17 @@ export const mockMemes: Meme[] = [
         caption: "Me explaining to my boss why I need a 3-hour lunch break 🍽️ #office #relatable",
         tags: ["office", "relatable"],
         creator: mockCreators[3],
-        upvotes: 3421,
-        downvotes: 89,
-        comments: 145,
-        shares: 67,
-        createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000), // 3 hours ago
+        stats: {
+            upvotes: 3421,
+            downvotes: 89,
+            comments: 145,
+            shares: 67,
+            saves: 12,
+            views: 8000,
+            score: 0
+        },
+        userInteraction: null,
+        createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
     },
     {
         id: "m_5",
@@ -187,11 +228,17 @@ export const mockMemes: Meme[] = [
         caption: "When you finally fix that bug at 3 AM and the whole project stops working 💀 #darkhumor #coding",
         tags: ["darkhumor", "relatable", "gaming"],
         creator: mockCreators[4],
-        upvotes: 15678,
-        downvotes: 234,
-        comments: 1234,
-        shares: 2345,
-        createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000), // 8 hours ago
+        stats: {
+            upvotes: 15678,
+            downvotes: 234,
+            comments: 1234,
+            shares: 2345,
+            saves: 890,
+            views: 75000,
+            score: 0
+        },
+        userInteraction: null,
+        createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
     },
     {
         id: "m_6",
@@ -201,11 +248,17 @@ export const mockMemes: Meme[] = [
         caption: "Chai break at 4 PM is not optional, it's a fundamental right ☕ #chai #desi",
         tags: ["desi", "wholesome", "office"],
         creator: mockCreators[5],
-        upvotes: 6789,
-        downvotes: 123,
-        comments: 345,
-        shares: 567,
-        createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000), // 12 hours ago
+        stats: {
+            upvotes: 6789,
+            downvotes: 123,
+            comments: 345,
+            shares: 567,
+            saves: 89,
+            views: 18000,
+            score: 0
+        },
+        userInteraction: null,
+        createdAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
     },
     {
         id: "m_7",
@@ -215,11 +268,17 @@ export const mockMemes: Meme[] = [
         caption: "Shah Rukh Khan spreading his arms: me when mom says she made biryani 🍚 #bollywood",
         tags: ["bollywood", "desi", "wholesome"],
         creator: mockCreators[1],
-        upvotes: 23456,
-        downvotes: 567,
-        comments: 2345,
-        shares: 4567,
-        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+        stats: {
+            upvotes: 23456,
+            downvotes: 567,
+            comments: 2345,
+            shares: 4567,
+            saves: 1200,
+            views: 100000,
+            score: 0
+        },
+        userInteraction: null,
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
     },
     {
         id: "m_8",
@@ -229,11 +288,17 @@ export const mockMemes: Meme[] = [
         caption: "IPL season is not just a tournament, it's a family thing 🏏💜 #cricket #ipl",
         tags: ["cricket", "desi"],
         creator: mockCreators[2],
-        upvotes: 18234,
-        downvotes: 890,
-        comments: 1567,
-        shares: 2890,
-        createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+        stats: {
+            upvotes: 18234,
+            downvotes: 890,
+            comments: 1567,
+            shares: 2890,
+            saves: 560,
+            views: 85000,
+            score: 0
+        },
+        userInteraction: null,
+        createdAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
     },
 ];
 

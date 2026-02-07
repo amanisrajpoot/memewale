@@ -1,8 +1,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { formatTimeAgo, formatCount } from "@/data/mockMemes";
-import type { Comment } from "@/data/mockComments";
+import { formatTimeAgo, formatCount } from "@/lib/utils";
+import type { Comment } from "@/lib/types";
 import { ArrowBigUp, ArrowBigDown, MessageCircle, MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import { useState, useCallback } from "react";
@@ -25,8 +25,8 @@ export function CommentItem({
     onReply,
     className,
 }: CommentItemProps) {
-    const [isUpvoted, setIsUpvoted] = useState(comment.isUpvoted ?? false);
-    const [isDownvoted, setIsDownvoted] = useState(comment.isDownvoted ?? false);
+    const [isUpvoted, setIsUpvoted] = useState(comment.userVote === 'up');
+    const [isDownvoted, setIsDownvoted] = useState(comment.userVote === 'down');
     const [upvoteCount, setUpvoteCount] = useState(comment.upvotes);
 
     const handleUpvote = useCallback(() => {
@@ -58,7 +58,7 @@ export function CommentItem({
             {/* Avatar - larger and more visible */}
             <div className="shrink-0">
                 <Image
-                    src={comment.author.avatar}
+                    src={comment.author.avatarUrl || `https://ui-avatars.com/api/?name=${comment.author.username}&background=random`}
                     alt={comment.author.displayName}
                     width={isReply ? 32 : 40}
                     height={isReply ? 32 : 40}
@@ -83,7 +83,7 @@ export function CommentItem({
 
                 {/* Text - much more readable */}
                 <p className="text-sm text-[var(--foreground)] leading-relaxed break-words">
-                    {comment.text}
+                    {comment.content}
                 </p>
 
                 {/* Actions - better spacing */}
@@ -119,14 +119,12 @@ export function CommentItem({
                     </div>
 
                     {/* Reply button */}
-                    {!isReply && (
-                        <button
-                            onClick={() => onReply?.(comment.id)}
-                            className="text-sm font-semibold text-[var(--foreground-muted)] hover:text-[var(--foreground)] transition-colors"
-                        >
-                            Reply
-                        </button>
-                    )}
+                    <button
+                        onClick={() => onReply?.(comment.id)}
+                        className="text-sm font-semibold text-[var(--foreground-muted)] hover:text-[var(--foreground)] transition-colors"
+                    >
+                        Reply
+                    </button>
                 </div>
             </div>
         </div>

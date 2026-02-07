@@ -24,20 +24,36 @@ export function AuthModal() {
         e.preventDefault();
         setLoading(true);
 
+        // Sanitize username
+        const cleanUsername = username.trim().toLowerCase();
+
         try {
             if (view === 'signup') {
-                const { error } = await supabase.auth.signUp({
+                if (!cleanUsername) {
+                    throw new Error("Username is required");
+                }
+
+                const { data, error } = await supabase.auth.signUp({
                     email,
                     password,
                     options: {
                         data: {
-                            username,
-                            full_name: username, // Default full name to username
+                            username: cleanUsername,
+                            full_name: cleanUsername, // Default full name to username
+                            display_name: cleanUsername,
                         }
                     }
                 });
                 if (error) throw error;
-                addToast("Check your email to verify your account!", "success");
+
+                // Handle session vs pending verification
+                if (data.session) {
+                    addToast("Account created successfully!", "success");
+                    router.refresh();
+                } else {
+                    addToast("Check your email to verify your account!", "success");
+                }
+
                 closeModal();
             } else if (view === 'login') {
                 const { error } = await supabase.auth.signInWithPassword({

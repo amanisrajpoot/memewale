@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { TopNav } from "./TopNav";
 import { MobileMenu } from "./MobileMenu";
@@ -50,30 +51,31 @@ export function AppShell({ children }: AppShellProps) {
 
                 {/* LEFT RAIL (Sticky Sidebar) - FIXED WIDTH */}
                 <header
-                    className="hidden lg:flex flex-col shrink-0 sticky top-0 h-screen z-[var(--z-sticky)] border-r border-[var(--border)]"
+                    className="hidden lg:flex flex-col shrink-0 sticky top-0 h-screen z-[var(--z-sticky)]"
                     style={{
                         width: "var(--sidebar-width)"
                         /* Removed paddingInlineStart to eliminate wasted space */
                     }}
                 >
                     {/* Logo Area for Desktop */}
-                    <div
-                        className="flex items-center mb-2"
+                    <Link
+                        href="/"
+                        className="flex items-center mb-2 hover:opacity-80 transition-opacity"
                         style={{
                             height: "var(--nav-height)",
-                            paddingInline: "var(--space-md)" /* Padding only for logo area */
+                            paddingInline: "var(--space-md)"
                         }}
                     >
-                        <span className="text-2xl mr-2">😂</span>
-                        <span className="text-xl font-bold text-[var(--foreground)] tracking-tight">Memewale</span>
-                    </div>
+                        <span className="text-3xl mr-3">😂</span>
+                        <span className="text-2xl font-black text-[var(--foreground)] tracking-tighter">Memewale</span>
+                    </Link>
                     <SideRail />
                 </header>
 
                 {/* CENTER COLUMN (Main Content) - FLEXIBLE WIDTH */}
                 <main
                     className={cn(
-                        "flex-1 min-h-screen border-r border-[var(--border)] border-l lg:border-l-0",
+                        "flex-1 min-h-screen",
                         "lg:pt-[var(--safe-top)]",
                         "pb-[var(--bottombar-height)] lg:pb-[var(--safe-bottom)]"
                     )}
@@ -101,6 +103,7 @@ export function AppShell({ children }: AppShellProps) {
                             <input
                                 type="text"
                                 placeholder="Search memes..."
+                                autoComplete="off"
                                 className="w-full rounded-full text-sm outline-none transition-all placeholder:text-[var(--foreground-subtle)]"
                                 style={{
                                     paddingInlineStart: "2.5rem",

@@ -66,12 +66,12 @@
      ============================================================================= */
 
   /* Micro spacing - for tight layouts */
-  --space-3xs: clamp(0.25rem, 0.23rem + 0.11vw, 0.31rem);
-  /* 4-5px */
-  --space-2xs: clamp(0.5rem, 0.46rem + 0.22vw, 0.63rem);
-  /* 8-10px */
-  --space-xs: clamp(0.75rem, 0.68rem + 0.33vw, 0.94rem);
-  /* 12-15px */
+  --space-3xs: 0.25rem;
+  /* 4px fixed */
+  --space-2xs: 0.5rem;
+  /* 8px fixed */
+  --space-xs: clamp(0.625rem, 0.55rem + 0.33vw, 0.75rem);
+  /* 10-12px */
 
   /* Core spacing - most common use */
   --space-sm: clamp(1rem, 0.91rem + 0.43vw, 1.25rem);
@@ -114,11 +114,11 @@
   --bottom-bar-height: 3.5rem;
   /* 56px - mobile bottom nav */
 
-  /* Sidebar widths - increased for better navigation visibility */
-  --sidebar-width: clamp(16rem, 14rem + 5vw, 20rem);
-  /* 256-320px - restored to original width */
-  --sidebar-collapsed: 4.5rem;
-  /* 72px - icon-only mode */
+  /* Sidebar widths - increased for better presence */
+  --sidebar-width: clamp(18rem, 16rem + 5vw, 22rem);
+  /* 288-352px - increased for more substance */
+  --sidebar-collapsed: 5rem;
+  /* 80px - icon-only mode */
 
   /* Content widths - increased for main feed */
   --content-width-sm: 40rem;
@@ -130,9 +130,9 @@
   --content-width-xl: 80rem;
   /* 1280px */
 
-  /* Right rail - restored to original width */
-  --right-rail-width: clamp(18rem, 16rem + 8vw, 22rem);
-  /* 288-352px - restored to original */
+  /* Right rail - increased width for better content visibility */
+  --right-rail-width: clamp(22.5rem, 20rem + 10vw, 30rem);
+  /* 360-480px - increased from 288-352px */
   --content-width-full: 100%;
 
   /* Grid system */
@@ -482,22 +482,35 @@ body {
 /* Feed container - centered with max-width for optimal readability */
 .feed-container {
   width: 100%;
-  max-width: 48rem;
-  /* 768px - optimal width for content readability */
+  max-width: 64rem;
+  /* Increased from 48rem for better desktop balance */
   margin-inline: auto;
-  /* Center the container */
-  padding-inline: var(--space-lg);
-  /* Generous horizontal padding */
-  padding-block: var(--space-md);
-  container-type: inline-size;
-  container-name: feed;
+  padding-inline: 1.5rem;
+  /* Mobile default */
+  padding-block: 1.5rem;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .feed-container {
-    padding-inline: var(--space-xl);
-    /* Even more padding on desktop */
-    padding-block: var(--space-xl);
+    padding-inline: 5rem;
+    /* User preference for centered breathing room */
+    padding-block: 2rem;
+  }
+}
+
+/* Standard page layout wrapper */
+.page-layout {
+  width: 100%;
+  max-width: 64rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+  padding-block: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .page-layout {
+    padding-inline: 5rem;
+    padding-block: 2rem;
   }
 }
 
@@ -528,7 +541,6 @@ body {
   background: var(--background);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  border: 1px solid var(--border);
   transition: all var(--transition-normal);
   margin-block-end: var(--space-lg);
   container-type: inline-size;
@@ -536,37 +548,37 @@ body {
 }
 
 .meme-card:hover {
-  border-color: var(--border-focus);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
 }
 
 .meme-card-header {
-  padding-inline: var(--space-lg);
-  /* Increased from var(--space-md) */
-  padding-block: var(--space-md);
+  padding-inline: var(--space-md);
+  padding-block: var(--space-xs);
+  /* Reduced from sm */
   background: var(--background-elevated);
 }
 
 .meme-card-media {
   position: relative;
   width: 100%;
+  max-height: 700px;
+  /* Cap extreme vertical memes */
   overflow: hidden;
   background: var(--background-elevated);
   /* No horizontal padding - media should be full width */
 }
 
 .meme-card-actions {
-  padding-inline: var(--space-lg);
-  /* Increased from var(--space-md) */
-  padding-block: var(--space-sm);
+  padding-inline: var(--space-md);
+  padding-block: var(--space-2xs);
   background: var(--background-elevated);
 }
 
 .meme-card-caption {
-  padding-inline: var(--space-lg);
-  /* Increased from var(--space-md) */
-  padding-block-start: var(--space-xs);
-  padding-block-end: var(--space-sm);
+  padding-inline: var(--space-md);
+  padding-block-start: 0;
+  padding-block-end: var(--space-3xs);
+  /* Reduced from 2xs */
   background: var(--background-elevated);
 }
 
@@ -574,9 +586,10 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-xs);
-  padding-inline: var(--space-lg);
-  /* Increased from var(--space-md) */
-  padding-block-end: var(--space-md);
+  padding-inline: var(--space-md);
+  /* Reduced from lg */
+  padding-block-end: var(--space-sm);
+  /* Reduced from md */
   background: var(--background-elevated);
 }
 

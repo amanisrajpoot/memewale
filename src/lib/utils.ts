@@ -45,6 +45,9 @@ export function formatRelativeTime(date: Date | string): string {
     return `${Math.floor(diffInSeconds / 31536000)}y ago`;
 }
 
+export const formatCount = formatCompactNumber;
+export const formatTimeAgo = formatRelativeTime;
+
 /**
  * Debounces a function call
  */

@@ -10,34 +10,49 @@ import { cn } from "@/lib/utils";
 
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/hooks/useToast";
+import type { Meme } from "@/lib/types";
 
 // Mapper function to convert DB result to Meme type
-const mapMeme = (item: any): any => ({
+const mapMeme = (item: any): Meme => ({
     id: item.id,
+    shortId: item.short_id,
     caption: item.caption,
-    mediaUrl: item.media_url, // Changed from item.url
+    mediaUrl: item.media_url,
     mediaType: item.media_type || "image",
     creator: {
         id: item.author.id,
         username: item.author.username,
         displayName: item.author.full_name || item.author.username,
-        // Fallback to UI avatars if no avatar
-        avatar: item.author.avatar_url || `https://ui-avatars.com/api/?name=${item.author.username}&background=random`,
+        avatarUrl: item.author.avatar_url || `https://ui-avatars.com/api/?name=${item.author.username}&background=random`,
         isVerified: item.author.is_verified || false,
+        bio: item.author.bio || null,
+        createdAt: item.author.created_at || new Date().toISOString(),
+        badges: [],
+        stats: {
+            // Default stats for user since we don't have them in this query
+            followers: 0,
+            following: 0,
+            memesPosted: 0,
+            totalUpvotes: 0,
+            totalShares: 0
+        }
     },
-    upvotes: item.upvote_count || 0,
-    downvotes: item.downvote_count || 0,
-    comments: item.comment_count || 0,
-    shares: item.share_count || 0,
+    stats: {
+        upvotes: item.upvote_count || 0,
+        downvotes: item.downvote_count || 0,
+        comments: item.comment_count || 0,
+        shares: item.share_count || 0,
+        saves: 0,
+        views: 0,
+        score: 0
+    },
+    userInteraction: null, // Initial state, will be hydrated by store/components
     createdAt: item.created_at,
-    tags: [], // Tags needs a join, keeping empty for now
-    isUpvoted: false, // Needs user-specific fetch
-    isDownvoted: false,
-    isSaved: false
+    tags: [],
 });
 
 export function FeedContainer({ sortBy = 'latest' }: { sortBy?: 'latest' | 'trending' }) {
-    const [items, setItems] = useState<any[]>([]);
+    const [items, setItems] = useState<Meme[]>([]);
     const [isInitialLoading, setIsInitialLoading] = useState(true);
     const supabase = createClient();
     const { addToast } = useToast();

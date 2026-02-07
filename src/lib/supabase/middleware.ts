@@ -1,6 +1,14 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Routes that require authentication
+const protectedPaths = [
+  '/notifications',
+  '/submit',
+  '/collections',
+  '/profile',
+];
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -34,6 +42,18 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
+  // Check if current path requires authentication
+  const { pathname } = request.nextUrl;
+  const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path));
+
+  if (isProtectedPath && !user) {
+    // Redirect to home with login prompt
+    const redirectUrl = new URL('/', request.url);
+    redirectUrl.searchParams.set('login', 'required');
+    redirectUrl.searchParams.set('redirect', pathname);
+    return NextResponse.redirect(redirectUrl);
+  }
 
   return supabaseResponse
 }
